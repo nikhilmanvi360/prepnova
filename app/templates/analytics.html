@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard — FoodWasteAI</title>
+    <meta name="description" content="Analytics dashboard with insights from food consumption data">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🍽️</span>
+            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/predict" class="nav-link">Predict</a>
+            <a href="/analytics" class="nav-link active">Analytics</a>
+        </div>
+    </nav>
+
+    <section class="analytics-section">
+        <div class="analytics-header">
+            <div class="form-badge">📊 Data Analytics</div>
+            <h1>Analytics Dashboard</h1>
+            <p>Insights from {{ total_rows }} data points of historical food consumption.</p>
+        </div>
+
+        <!-- Model Performance Summary -->
+        <div class="model-summary">
+            <div class="model-card best-model">
+                <div class="model-badge">🏆 Best Model</div>
+                <h3>{{ best_model }}</h3>
+                <div class="model-stats">
+                    {% for name, metrics in model_results.items() %}
+                    <div class="model-stat {{ 'highlight' if name == best_model else '' }}">
+                        <span class="model-name">{{ name }}</span>
+                        <span class="model-metric">MAE: {{ "%.1f"|format(metrics.MAE) }}</span>
+                        <span class="model-metric">RMSE: {{ "%.1f"|format(metrics.RMSE) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>📅 Average Meals by Weekday</h3>
+                <canvas id="chart-weekday"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🌤️ Weather Impact on Demand</h3>
+                <canvas id="chart-weather"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🎉 Festival vs Non-Festival</h3>
+                <canvas id="chart-festival"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>👥 Customers vs Meals Consumed</h3>
+                <canvas id="chart-scatter"></canvas>
+            </div>
+            <div class="chart-card chart-wide">
+                <h3>🏆 Model Performance Comparison</h3>
+                <canvas id="chart-models"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Smart Food Waste Prediction System &copy; 2026</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='charts.js') }}"></script>
+</body>
+
+</html>

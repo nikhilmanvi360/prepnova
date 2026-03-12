@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result — FoodWasteAI</title>
+    <meta name="description" content="Your meal demand prediction results and insights">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🍽️</span>
+            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/predict" class="nav-link">Predict</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
+        </div>
+    </nav>
+
+    <section class="result-section">
+        <div class="result-container">
+            <!-- Main Prediction Card -->
+            <div class="result-hero">
+                <div class="result-badge">✅ Prediction Complete</div>
+                <div class="result-main">
+                    <div class="result-label">Recommended Meals to Prepare</div>
+                    <div class="result-number" id="result-number">{{ predicted }}</div>
+                    <div class="result-confidence confidence-{{ confidence|lower }}">
+                        Confidence Level: <strong>{{ confidence }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Summary -->
+            <div class="result-grid">
+                <div class="info-card">
+                    <h3>📋 Input Summary</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Day</span>
+                            <span class="info-value">{{ inputs.day }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Weather</span>
+                            <span class="info-value">{{ inputs.weather }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Festival</span>
+                            <span class="info-value">{{ inputs.festival }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Expected Customers</span>
+                            <span class="info-value">{{ inputs.expected_customers }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prev Day Consumption</span>
+                            <span class="info-value">{{ inputs.prev_day }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prev Week Same Day</span>
+                            <span class="info-value">{{ inputs.prev_week }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if waste_estimate > 0 %}
+                <div class="info-card warning-card">
+                    <h3>⚠️ Waste Alert</h3>
+                    <div class="waste-info">
+                        <div class="waste-number">~{{ waste_estimate }}</div>
+                        <div class="waste-label">Estimated meals wasted if {{ inputs.expected_customers }} prepared
+                        </div>
+                    </div>
+                    <p class="waste-tip">Prepare <strong>{{ predicted }}</strong> meals instead to minimize waste.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Smart Tips -->
+            {% if tips %}
+            <div class="tips-section">
+                <h3>💡 Smart Insights</h3>
+                <div class="tips-grid">
+                    {% for tip in tips %}
+                    <div class="tip-card tip-{{ tip.type }}">
+                        <span class="tip-card-icon">{{ tip.icon }}</span>
+                        <p>{{ tip.text }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="result-actions">
+                <a href="/predict" class="btn btn-primary" id="btn-new-prediction">
+                    <span class="btn-icon">🔄</span> New Prediction
+                </a>
+                <a href="/analytics" class="btn btn-secondary" id="btn-go-analytics">
+                    <span class="btn-icon">📊</span> View Analytics
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Smart Food Waste Prediction System &copy; 2026</p>
+    </footer>
+
+    <script>
+        // Animate the result number counting up
+        const el = document.getElementById('result-number');
+        const target = parseInt(el.textContent);
+        let current = 0;
+        const step = Math.ceil(target / 40);
+        const interval = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                current = target;
+                clearInterval(interval);
+            }
+            el.textContent = current;
+        }, 25);
+    </script>
+</body>
+
+</html>

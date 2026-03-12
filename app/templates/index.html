@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food Waste Prediction System</title>
+    <meta name="description" content="AI-powered meal demand prediction to reduce food waste in food service operations">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Animated Background Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🍽️</span>
+            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/predict" class="nav-link">Predict</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🤖 AI-Powered Prediction Engine</div>
+            <h1 class="hero-title">
+                Smart Food Waste<br>
+                <span class="gradient-text">Prediction System</span>
+            </h1>
+            <p class="hero-subtitle">
+                Reduce food waste and optimize meal preparation using machine learning. 
+                Predict daily meal demand based on weather, events, and historical data.
+            </p>
+            <div class="hero-actions">
+                <a href="/predict" class="btn btn-primary btn-lg" id="btn-start-prediction">
+                    <span class="btn-icon">🎯</span> Start Prediction
+                </a>
+                <a href="/analytics" class="btn btn-secondary btn-lg" id="btn-view-analytics">
+                    <span class="btn-icon">📊</span> View Analytics
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value">1,000+</div>
+                    <div class="stat-label">Data Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">ML Models</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">&lt;2s</div>
+                    <div class="stat-label">Prediction Time</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card card-1">
+                <div class="card-icon">☀️</div>
+                <div class="card-text">Weather Analysis</div>
+            </div>
+            <div class="floating-card card-2">
+                <div class="card-icon">📈</div>
+                <div class="card-text">Demand Forecast</div>
+            </div>
+            <div class="floating-card card-3">
+                <div class="card-icon">🎉</div>
+                <div class="card-text">Event Detection</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">How It Works</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📥</div>
+                <h3>Input Data</h3>
+                <p>Enter day, weather, events, expected customers, and historical consumption data.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>AI Processing</h3>
+                <p>Our Random Forest model analyzes 12 engineered features to generate accurate demand predictions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Smart Insights</h3>
+                <p>Receive predictions with confidence levels, waste warnings, and contextual tips.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Smart Food Waste Prediction System &copy; 2026 &mdash; ML Internship Project</p>
+    </footer>
+
+    <script>
+        // Floating particle animation
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 6 + 's';
+                p.style.animationDuration = (4 + Math.random() * 6) + 's';
+                p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+    </script>
+</body>
+</html>
