@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-    --color-alabaster: #FDFBFA;
-    --color-espresso: #2A2A2A;
-    --color-terracotta: #C85A32;
-    --color-forest: #345E45;
-    --color-forest-light: #4A7A5D;
-    --color-sand: #F2EFE9;
+    --color-canvas: #FAFAFA;
+    --color-slate-base: #0F172A;
+    --color-slate-light: #475569;
+    --color-slate-surface: #F1F5F9;
+    --color-emerald-primary: #059669;
+    --color-emerald-light: #10B981;
+    --color-rose-urgency: #E11D48;
 
     --font-heading: "Instrument Serif", serif;
     --font-body: "Inter", sans-serif;
@@ -16,8 +17,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
 
     body {
-        background-color: var(--color-alabaster);
-        color: var(--color-espresso);
+        background-color: var(--color-canvas);
+        color: var(--color-slate-base);
         font-family: var(--font-body);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -25,7 +26,7 @@
     }
 
     ::selection {
-        background-color: var(--color-terracotta);
+        background-color: var(--color-emerald-light);
         color: white;
     }
 
@@ -40,6 +41,13 @@
 
 @layer utilities {
     .subtle-shadow {
-        box-shadow: 0 10px 40px -10px rgba(42, 42, 42, 0.08);
+        box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
     }
 }
