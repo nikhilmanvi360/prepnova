@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Sparkles, Environment } from '@react-three/drei';
+import * as THREE from 'three';
 import {
   ArrowRight,
   Leaf,
@@ -117,6 +120,67 @@ const Navbar = () => (
   </motion.nav>
 );
 
+// --- 3D Nature Scene Components ---
+
+const Terrain = () => {
+  const geomRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (geomRef.current) {
+      const attrs = geomRef.current.attributes.position;
+      // Procedural generation of gentle rolling hills
+      for (let i = 0; i < attrs.count; i++) {
+        const x = attrs.getX(i);
+        const y = attrs.getY(i);
+        const z = Math.sin(x * 0.4) * Math.cos(y * 0.4) * 1.5 + Math.sin(x * 0.1 + y * 0.2) * 2.5;
+        attrs.setZ(i, z);
+      }
+      geomRef.current.computeVertexNormals();
+    }
+  }, []);
+
+  const meshRef = useRef<any>(null);
+  useFrame((state) => {
+    if (meshRef.current) {
+      // Gentle, hypnotic rotation
+      meshRef.current.rotation.z = state.clock.getElapsedTime() * 0.03;
+      // Subtle float
+      meshRef.current.position.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.5 - 2;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, -3, -2]} rotation={[-Math.PI / 2.2, 0, 0]} receiveShadow castShadow>
+      <planeGeometry ref={geomRef} args={[40, 40, 64, 64]} />
+      <meshStandardMaterial
+        color="#3F6212" // moss green
+        roughness={0.9}
+        metalness={0.05}
+        flatShading={true} // gives it a slightly stylized, geometric look
+      />
+    </mesh>
+  );
+};
+
+const NatureScene = () => {
+  return (
+    <Canvas camera={{ position: [0, 2, 10], fov: 45 }} shadows>
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[10, 10, 5]} intensity={2} color="#FDE047" castShadow />
+      <directionalLight position={[-10, 5, -5]} intensity={0.8} color="#92400E" />
+
+      <Terrain />
+
+      {/* Floating pollen / seeds */}
+      <Sparkles count={300} scale={20} size={6} speed={0.4} opacity={0.6} color="#FDE047" position={[0, 4, 0]} />
+
+      <Environment preset="sunset" />
+    </Canvas>
+  );
+};
+
+// --- End 3D Scene Components ---
+
 const Hero = () => {
   return (
     <section className="relative min-h-[95vh] w-full flex flex-col justify-center px-6 lg:px-12 pt-32 pb-20 bg-paper">
@@ -149,32 +213,19 @@ const Hero = () => {
           </FadeIn>
         </div>
 
-        {/* Cinematic Imagery Column */}
-        <div className="lg:col-span-6 relative h-[600px] md:h-[750px] w-full mt-12 lg:mt-0">
+        {/* Cinematic 3D Canvas Column */}
+        <div className="lg:col-span-6 relative h-[600px] md:h-[800px] w-full mt-12 lg:mt-0 xl:-mr-20">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, rotate: -2 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1.5, ease: CUSTOM_EASE }}
-            className="absolute top-0 right-0 w-[80%] h-[70%] z-10"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 2, ease: CUSTOM_EASE }}
+            className="absolute inset-0 z-10 scale-125 md:scale-150 pointer-events-auto cursor-grab active:cursor-grabbing"
           >
-            <img
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2600&auto=format&fit=crop"
-              alt="Vast farmland"
-              className="w-full h-full object-cover rounded-[2rem] journal-shadow sepia-[10%]"
-            />
-          </motion.div>
+            <NatureScene />
 
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: -20 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            transition={{ duration: 1.2, ease: CUSTOM_EASE, delay: 0.4 }}
-            className="absolute bottom-0 left-0 w-[60%] h-[50%] z-20 border-8 border-paper rounded-[2.5rem]"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2600&auto=format&fit=crop"
-              alt="Fresh harvest"
-              className="w-full h-full object-cover rounded-[2rem] sepia-[20%]"
-            />
+            {/* Atmospheric foreground vignette array to blend canvas edges */}
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_-100px_100px_-50px_#FAFAF9]"></div>
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_100px_100px_-50px_#FAFAF9]"></div>
           </motion.div>
         </div>
 
@@ -282,7 +333,7 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section id="process" className="py-32 px-6 lg:px-12 bg-ink-base text-paper border-t border-ink-base/5 relative overflow-hidden">
+    <section id="process" className="py-32 px-6 lg:px-12 bg-card text-ink-base border-t border-ink-base/5 relative overflow-hidden">
       {/* Decorative large bg text */}
       <div className="absolute top-0 right-0 max-w-5xl opacity-5 pointer-events-none select-none">
         <h1 className="font-heading italic text-[20vw] leading-[0.8] tracking-tighter text-right">Machine<br />Learning</h1>
@@ -296,11 +347,11 @@ const ProcessSection = () => {
               <span className="text-moss font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
                 The Intelligence Process
               </span>
-              <h2 className="font-heading italic text-6xl md:text-7xl mb-8 text-balance">Data. Not<br />guesswork.</h2>
-              <p className="text-xl text-paper/70 leading-relaxed mb-12">
+              <h2 className="font-heading italic text-6xl md:text-7xl mb-8 text-balance text-ink-base">Data. Not<br />guesswork.</h2>
+              <p className="text-xl text-ink-light leading-relaxed mb-12">
                 Running a kitchen on intuition inherently creates waste. Our machine learning pipeline shifts operations from reactive guessing to proactive precision.
               </p>
-              <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="canvas">
+              <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
                 Launch the Intelligence Tool
               </PremiumButton>
             </FadeIn>
@@ -311,17 +362,17 @@ const ProcessSection = () => {
               <FadeIn key={i} delay={i * 0.15}>
                 <div className="flex gap-8 group">
                   <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 rounded-full border border-paper/20 flex items-center justify-center bg-paper/5 text-earth-accent group-hover:bg-earth-accent group-hover:text-paper group-hover:border-earth-accent transition-all duration-300">
+                    <div className="w-16 h-16 rounded-full border border-ink-base/20 flex items-center justify-center bg-ink-base/5 text-earth-accent group-hover:bg-earth-accent group-hover:text-paper group-hover:border-earth-accent transition-all duration-300">
                       <step.icon className="w-6 h-6" />
                     </div>
                     {i !== steps.length - 1 && (
-                      <div className="w-[1px] h-full bg-paper/10 mt-4 group-hover:bg-earth-accent/30 transition-colors"></div>
+                      <div className="w-[1px] h-full bg-ink-base/10 mt-4 group-hover:bg-earth-accent/30 transition-colors"></div>
                     )}
                   </div>
                   <div className="pb-12 pt-2">
-                    <span className="text-paper/40 font-mono text-sm block mb-2">0{i + 1}</span>
-                    <h3 className="font-heading italic text-4xl mb-4 text-paper">{step.title}</h3>
-                    <p className="text-paper/70 leading-relaxed text-lg">{step.desc}</p>
+                    <span className="text-ink-base/40 font-mono text-sm block mb-2">0{i + 1}</span>
+                    <h3 className="font-heading italic text-4xl mb-4 text-ink-base">{step.title}</h3>
+                    <p className="text-ink-light leading-relaxed text-lg">{step.desc}</p>
                   </div>
                 </div>
               </FadeIn>
