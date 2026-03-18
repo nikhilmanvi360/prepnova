@@ -50,8 +50,8 @@ An ML-powered Flask web application that predicts daily meal demand in food serv
 ## Constraints
 
 ### Technical
-- Python + Flask only (no React/frontend frameworks)
-- Jinja2 templates with vanilla CSS/JS
+- Backend: Python + Flask API
+- Frontend: Separate React + Tailwind SPA
 - Model serialized with joblib/pickle
 - Synthetic dataset (1000 rows)
 
@@ -75,7 +75,8 @@ An ML-powered Flask web application that predicts daily meal demand in food serv
 
 | Decision | Choice | Rationale | Date |
 |----------|--------|-----------|------|
-| Framework | Flask + Jinja2 | Specified in readme | 2026-03-13 |
+| Backend | Flask API | Standard ML serving | 2026-03-13 |
+| Frontend | React + Tailwind | Modern landing page UX | 2026-03-18 |
 | Model format | joblib .pkl | Standard sklearn serialization | 2026-03-13 |
 | Dataset | Synthetic generation | No real dataset provided | 2026-03-13 |
 | Charts | Chart.js via CDN | Lightweight, no npm needed | 2026-03-13 |

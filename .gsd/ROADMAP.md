@@ -7,7 +7,7 @@ updated: 2026-03-13T01:03:00+05:30
 # Roadmap
 
 > **Current Phase:** Complete
-> **Status:** ✅ All phases done
+> **Status:** ✅ All phases done (including frontend refinement)
 
 ## Must-Haves (from SPEC)
 
@@ -77,15 +77,15 @@ updated: 2026-03-13T01:03:00+05:30
 ---
 
 ### Phase 6: Frontend Landing Page
-**Status:** 🔄 In Progress
-**Objective:** Build a separate React + Tailwind frontend with scrollytelling animation and Flask integration
+**Status:** ✅ Complete
+**Objective:** Build a separate React + Tailwind frontend as a modern landing page (static UI, no scrollytelling/iframe)
 **Depends on:** Phase 5
 
 **Plans:**
 - [x] Plan 6.1: Scaffold Vite + React + Tailwind project in `frontend/`
-- [x] Plan 6.2: Implement Navbar, Hero Section, Scrollytelling (210 frames)
-- [x] Plan 6.3: Integrate Flask app via iframe in Prediction section
-- [ ] Plan 6.4: Final verification and polish
+- [x] Plan 6.2: Implement modern Navbar and Hero Section (static, robust)
+- [x] Plan 6.3: Refactor Prediction section for future API integration (no iframe)
+- [x] Plan 6.4: Final verification and polish
 
 ---
 
@@ -98,7 +98,7 @@ updated: 2026-03-13T01:03:00+05:30
 | 3 | ✅ | 2/2 | 2026-03-13 |
 | 4 | ✅ | 2/2 | 2026-03-13 |
 | 5 | ✅ | 1/1 | 2026-03-13 |
-| 6 | 🔄 | 3/4 | — |
+| 6 | ✅ | 4/4 | 2026-03-18 |
 
 ---
 
@@ -111,5 +111,5 @@ updated: 2026-03-13T01:03:00+05:30
 | 3 | — | — | — |
 | 4 | — | — | — |
 | 5 | — | — | — |
-| 6 | 2026-03-15 | — | — |
+| 6 | 2026-03-18 | 2026-03-18 | < 1 day |
 

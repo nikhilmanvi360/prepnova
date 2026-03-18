@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
-import { 
-  ArrowUpRight, 
-  Play, 
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  ArrowUpRight,
+  Play,
   ChevronDown,
   Utensils,
   BarChart3,
@@ -99,11 +99,11 @@ const BlurText = ({ text, className, as: Component = "div" }: any) => {
             className="inline-block mr-[0.25em]"
             variants={{
               hidden: { filter: 'blur(12px)', opacity: 0, y: 40 },
-              visible: { 
-                filter: 'blur(0px)', 
-                opacity: 1, 
-                y: 0, 
-                transition: { ease: CUSTOM_EASE, duration: 0.8 } 
+              visible: {
+                filter: 'blur(0px)',
+                opacity: 1,
+                y: 0,
+                transition: { ease: CUSTOM_EASE, duration: 0.8 }
               }
             }}
           >
@@ -128,7 +128,7 @@ const FadeIn = ({ children, className, delay = 0 }: any) => (
 );
 
 const Navbar = () => (
-  <motion.nav 
+  <motion.nav
     initial={{ y: -20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 1, ease: CUSTOM_EASE, delay: 0.2 }}
@@ -138,7 +138,7 @@ const Navbar = () => (
       <Utensils className="w-5 h-5 text-white" />
       <span className="font-heading italic text-xl tracking-wide">PrepNova</span>
     </div>
-    
+
     <div className="hidden md:flex liquid-glass rounded-full px-8 py-3 items-center gap-8 pointer-events-auto">
       {['Home', 'Prediction Tool', 'Analytics', 'About'].map((item) => (
         <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors tracking-wide">
@@ -155,21 +155,21 @@ const Navbar = () => (
 );
 
 const Hero = () => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 1000], [0, 300]);
-  const opacity = useTransform(scrollY, [0, 600], [1, 0]);
-  const scale = useTransform(scrollY, [0, 800], [1, 1.1]);
-
   return (
     <section id="home" className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-      <motion.div style={{ y, opacity, scale }} className="absolute inset-0 w-full h-full">
-        <img 
+      <motion.div
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.5, ease: CUSTOM_EASE }}
+        className="absolute inset-0 w-full h-full"
+      >
+        <img
           className="w-full h-full object-cover opacity-40"
           src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
           alt="Data Analytics Background"
         />
       </motion.div>
-      
+
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#02040A]/60 to-[#02040A]" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-5xl mx-auto mt-20">
@@ -180,9 +180,9 @@ const Hero = () => {
           </div>
         </FadeIn>
 
-        <BlurText 
+        <BlurText
           as="h1"
-          text="Smart Food Demand Prediction" 
+          text="Smart Food Demand Prediction"
           className="font-heading italic text-6xl md:text-8xl lg:text-9xl text-balance tracking-tight leading-[0.9] mb-8"
         />
 
@@ -225,16 +225,16 @@ const PredictionInterface = () => {
   return (
     <section id="prediction-tool" className="py-32 px-6 lg:px-12 relative max-w-[1600px] mx-auto">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start relative z-10">
-        
+
         {/* Input Form */}
         <div>
           <FadeIn>
             <h2 className="font-heading italic text-5xl md:text-6xl tracking-tight mb-4">Daily Context</h2>
             <p className="text-white/60 mb-12 text-lg">Input today's operational data to generate an accurate demand forecast.</p>
           </FadeIn>
-          
+
           <FadeIn delay={0.2} className="liquid-glass p-8 md:p-10 rounded-3xl">
             <form onSubmit={handlePredict} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -300,8 +300,8 @@ const PredictionInterface = () => {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isPredicting}
                 className="w-full bg-white text-black rounded-xl py-4 font-medium hover:bg-white/90 transition-colors mt-4 flex justify-center items-center gap-2 disabled:opacity-70"
               >
@@ -325,7 +325,7 @@ const PredictionInterface = () => {
         <div className="h-full flex flex-col justify-center">
           <AnimatePresence mode="wait">
             {!showResults && !isPredicting && (
-              <motion.div 
+              <motion.div
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -341,7 +341,7 @@ const PredictionInterface = () => {
             )}
 
             {isPredicting && (
-              <motion.div 
+              <motion.div
                 key="loading"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -360,14 +360,14 @@ const PredictionInterface = () => {
             )}
 
             {showResults && (
-              <motion.div 
+              <motion.div
                 key="results"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="liquid-glass-strong rounded-[2.5rem] p-10 border border-emerald-500/20 relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
-                
+
                 <div className="flex items-center gap-2 mb-8">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   <span className="text-xs uppercase tracking-[0.2em] text-emerald-400/80 font-medium">Prediction Complete</span>
@@ -438,7 +438,7 @@ const AnalyticsDashboard = () => {
               <h3 className="text-xl font-medium tracking-wide">{chart.title}</h3>
             </div>
             <p className="text-xs uppercase tracking-[0.2em] text-white/40 mb-8">{chart.desc}</p>
-            
+
             {/* Placeholder for actual charts */}
             <div className="flex-grow flex items-center justify-center border border-white/5 border-dashed rounded-xl bg-white/[0.02]">
               <span className="text-white/20 text-sm font-medium tracking-widest uppercase">Chart Visualization</span>
@@ -453,7 +453,7 @@ const AnalyticsDashboard = () => {
 const Footer = () => (
   <footer className="border-t border-white/10 pt-24 pb-12 px-6 lg:px-12 max-w-[1600px] mx-auto mt-20">
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 lg:gap-12">
-      
+
       <div className="lg:col-span-2">
         <div className="flex items-center gap-3 mb-8">
           <div className="liquid-glass rounded-full p-2">
@@ -461,15 +461,15 @@ const Footer = () => (
           </div>
           <span className="font-medium tracking-[0.2em] uppercase text-sm">PrepNova</span>
         </div>
-        
+
         <h2 className="font-heading italic text-5xl md:text-6xl tracking-tight mb-10 max-w-md text-balance">
           Optimize your kitchen.
         </h2>
-        
+
         <div className="liquid-glass rounded-full p-2 flex max-w-md">
-          <input 
-            type="email" 
-            placeholder="Enter email for updates" 
+          <input
+            type="email"
+            placeholder="Enter email for updates"
             className="bg-transparent border-none outline-none px-6 w-full text-white placeholder:text-white/40 font-body"
           />
           <button className="bg-white text-black rounded-full px-6 py-3 font-medium hover:bg-white/90 transition-colors whitespace-nowrap">
