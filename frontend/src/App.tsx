@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, Environment } from '@react-three/drei';
+import { Sparkles, Environment, MeshDistortMaterial, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import {
   ArrowRight,
