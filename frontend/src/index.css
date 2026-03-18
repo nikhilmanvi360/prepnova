@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-    --color-canvas: #FAFAFA;
-    --color-slate-base: #0F172A;
-    --color-slate-light: #475569;
-    --color-slate-surface: #F1F5F9;
-    --color-emerald-primary: #059669;
-    --color-emerald-light: #10B981;
-    --color-rose-urgency: #E11D48;
+    --color-paper: #FAFAF9;
+    /* warm, unbleached stone-50 */
+    --color-card: #F5F5F4;
+    /* slightly deeper stone-100 */
+    --color-clay-bg: #E7E5E4;
+    /* contrast section stone-200 */
+    --color-ink-base: #1C1917;
+    /* rich, warm black stone-900 */
+    --color-ink-light: #57534E;
+    /* softer reading text stone-500 */
+    --color-moss: #3F6212;
+    /* deep, grounding lime-800 */
+    --color-moss-light: #4D7C0F;
+    /* hover state lime-700 */
+    --color-earth-accent: #92400E;
+    /* urgency/highlight amber-800 */
 
     --font-heading: "Instrument Serif", serif;
     --font-body: "Inter", sans-serif;
@@ -17,8 +26,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
 
     body {
-        background-color: var(--color-canvas);
-        color: var(--color-slate-base);
+        background-color: var(--color-paper);
+        color: var(--color-ink-base);
         font-family: var(--font-body);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -26,7 +35,7 @@
     }
 
     ::selection {
-        background-color: var(--color-emerald-light);
+        background-color: var(--color-moss-light);
         color: white;
     }
 
@@ -40,14 +49,8 @@
 }
 
 @layer utilities {
-    .subtle-shadow {
-        box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
-    }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+    .journal-shadow {
+        box-shadow: 0 4px 20px -5px rgba(28, 25, 23, 0.05);
+        /* very soft, warm shadow */
     }
 }
