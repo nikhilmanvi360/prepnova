@@ -1,8 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, Environment, MeshDistortMaterial, Float } from '@react-three/drei';
-import * as THREE from 'three';
 import {
   ArrowRight,
   Leaf,
@@ -120,74 +117,31 @@ const Navbar = () => (
   </motion.nav>
 );
 
-// --- 3D Nature Scene Components ---
-
-const Terrain = () => {
-  const geomRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (geomRef.current) {
-      const attrs = geomRef.current.attributes.position;
-      // Procedural generation of gentle rolling hills
-      for (let i = 0; i < attrs.count; i++) {
-        const x = attrs.getX(i);
-        const y = attrs.getY(i);
-        const z = Math.sin(x * 0.4) * Math.cos(y * 0.4) * 1.5 + Math.sin(x * 0.1 + y * 0.2) * 2.5;
-        attrs.setZ(i, z);
-      }
-      geomRef.current.computeVertexNormals();
-    }
-  }, []);
-
-  const meshRef = useRef<any>(null);
-  useFrame((state) => {
-    if (meshRef.current) {
-      // Gentle, hypnotic rotation
-      meshRef.current.rotation.z = state.clock.getElapsedTime() * 0.03;
-      // Subtle float
-      meshRef.current.position.z = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.5 - 2;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, -3, -2]} rotation={[-Math.PI / 2.2, 0, 0]} receiveShadow castShadow>
-      <planeGeometry ref={geomRef} args={[40, 40, 64, 64]} />
-      <meshStandardMaterial
-        color="#3F6212" // moss green
-        roughness={0.9}
-        metalness={0.05}
-        flatShading={true} // gives it a slightly stylized, geometric look
-      />
-    </mesh>
-  );
-};
-
-const NatureScene = () => {
-  return (
-    <Canvas camera={{ position: [0, 2, 10], fov: 45 }} shadows>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[10, 10, 5]} intensity={2} color="#FDE047" castShadow />
-      <directionalLight position={[-10, 5, -5]} intensity={0.8} color="#92400E" />
-
-      <Terrain />
-
-      {/* Floating pollen / seeds */}
-      <Sparkles count={300} scale={20} size={6} speed={0.4} opacity={0.6} color="#FDE047" position={[0, 4, 0]} />
-
-      <Environment preset="sunset" />
-    </Canvas>
-  );
-};
-
-// --- End 3D Scene Components ---
-
 const Hero = () => {
+  const heroImages = [
+    { src: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop", alt: "Golden farmland at sunset" },
+    { src: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800&auto=format&fit=crop", alt: "Fresh vegetables" },
+    { src: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop", alt: "Farmer's harvest" },
+  ];
+
   return (
-    <section className="relative min-h-[95vh] w-full flex flex-col justify-center px-6 lg:px-12 pt-32 pb-20 bg-paper">
+    <section className="relative min-h-[95vh] w-full flex flex-col justify-center px-6 lg:px-12 pt-32 pb-20 bg-paper overflow-hidden">
+      {/* Ambient floating blurs */}
+      <motion.div
+        animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-20 right-[15%] w-72 h-72 rounded-full bg-moss/5 blur-3xl pointer-events-none"
+      />
+      <motion.div
+        animate={{ y: [0, 15, 0], x: [0, -8, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-20 left-[10%] w-96 h-96 rounded-full bg-earth-accent/5 blur-3xl pointer-events-none"
+      />
+
       <div className="max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
         {/* Typography / Story Column */}
-        <div className="lg:col-span-6 z-20 xl:pr-12">
+        <div className="lg:col-span-5 z-20 xl:pr-8">
           <FadeIn>
             <span className="inline-block text-earth-accent font-medium tracking-[0.2em] uppercase text-xs mb-8 border-b border-earth-accent/30 pb-2">
               An Environmental Journal
@@ -195,7 +149,7 @@ const Hero = () => {
           </FadeIn>
 
           <FadeIn delay={0.1}>
-            <h1 className="font-heading italic text-7xl md:text-[110px] text-ink-base leading-[0.9] text-balance drop-shadow-sm">
+            <h1 className="font-heading italic text-7xl md:text-[100px] text-ink-base leading-[0.9] text-balance drop-shadow-sm">
               The earth provides.<br />We waste.
             </h1>
           </FadeIn>
@@ -211,22 +165,86 @@ const Hero = () => {
               Launch Prediction Engine
             </PremiumButton>
           </FadeIn>
+
+          {/* Animated micro-stats bar */}
+          <FadeIn delay={0.5} className="mt-16 flex items-center gap-8 border-t border-ink-base/10 pt-8">
+            {[
+              { value: "1.3B", label: "Tons wasted/yr" },
+              { value: "40%", label: "Reduction possible" },
+              { value: "$1T", label: "Lost annually" }
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col">
+                <motion.span
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.6 + i * 0.15, duration: 0.8, ease: CUSTOM_EASE }}
+                  className="font-heading italic text-3xl text-earth-accent"
+                >{stat.value}</motion.span>
+                <span className="text-xs text-ink-light tracking-wide uppercase mt-1">{stat.label}</span>
+              </div>
+            ))}
+          </FadeIn>
         </div>
 
-        {/* Cinematic 3D Canvas Column */}
-        <div className="lg:col-span-6 relative h-[600px] md:h-[800px] w-full mt-12 lg:mt-0 xl:-mr-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2, ease: CUSTOM_EASE }}
-            className="absolute inset-0 z-10 scale-125 md:scale-150 pointer-events-auto cursor-grab active:cursor-grabbing"
-          >
-            <NatureScene />
+        {/* Cinematic Image Mosaic */}
+        <div className="lg:col-span-7 relative h-[550px] md:h-[700px] w-full mt-8 lg:mt-0">
+          <div className="absolute inset-0 grid grid-cols-3 grid-rows-2 gap-4">
+            {/* Main large image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.4, ease: CUSTOM_EASE, delay: 0.2 }}
+              className="col-span-2 row-span-2 relative rounded-[1.5rem] overflow-hidden journal-shadow group"
+            >
+              <img
+                src={heroImages[0].src}
+                alt={heroImages[0].alt}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink-base/20 via-transparent to-transparent" />
+              {/* Overlay badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2, duration: 0.8, ease: CUSTOM_EASE }}
+                className="absolute bottom-6 left-6 bg-paper/90 backdrop-blur-sm rounded-full px-5 py-2.5 flex items-center gap-2 shadow-lg"
+              >
+                <Leaf className="w-4 h-4 text-moss" />
+                <span className="text-sm font-medium text-ink-base">Sustainable Farming</span>
+              </motion.div>
+            </motion.div>
 
-            {/* Atmospheric foreground vignette array to blend canvas edges */}
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_-100px_100px_-50px_#FAFAF9]"></div>
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_100px_100px_-50px_#FAFAF9]"></div>
-          </motion.div>
+            {/* Top-right tile */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: CUSTOM_EASE, delay: 0.5 }}
+              className="col-span-1 row-span-1 relative rounded-[1.5rem] overflow-hidden journal-shadow group"
+            >
+              <img
+                src={heroImages[1].src}
+                alt={heroImages[1].alt}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink-base/20 via-transparent to-transparent" />
+            </motion.div>
+
+            {/* Bottom-right tile */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: CUSTOM_EASE, delay: 0.7 }}
+              className="col-span-1 row-span-1 relative rounded-[1.5rem] overflow-hidden journal-shadow group"
+            >
+              <img
+                src={heroImages[2].src}
+                alt={heroImages[2].alt}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink-base/20 via-transparent to-transparent" />
+            </motion.div>
+          </div>
         </div>
 
       </div>
