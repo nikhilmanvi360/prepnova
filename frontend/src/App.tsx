@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import {
   ArrowRight,
@@ -7,7 +7,10 @@ import {
   Droplets,
   Tractor,
   Flame,
-  Globe2
+  Globe2,
+  Database,
+  Cpu,
+  LineChart
 } from 'lucide-react';
 
 const CUSTOM_EASE = [0.25, 1, 0.5, 1];
@@ -24,28 +27,56 @@ const FadeIn = ({ children, className, delay = 0, yOffset = 30 }: any) => (
   </motion.div>
 );
 
-// High-end Shadcn-inspired animated button
-const InteractiveButton = ({ href, children, icon: Icon, className = "", variant = "primary" }: any) => {
-  const baseClasses = "relative overflow-hidden px-10 py-5 rounded-none font-medium tracking-wide transition-all group flex items-center justify-center gap-3 text-lg cursor-pointer";
+// High-end Premium Pill Button with sweeping hover animation
+const PremiumButton = ({ href, children, icon: Icon, className = "", variant = "primary" }: any) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const variants = {
-    primary: "bg-ink-base text-paper hover:bg-ink-light",
-    accent: "bg-moss text-paper hover:bg-moss-light",
-    ghost: "bg-transparent text-ink-base border border-ink-base/20 hover:border-ink-base"
+    primary: {
+      bgSweep: "bg-ink-base",
+      textIdle: "text-ink-base",
+      textHover: "text-paper",
+      border: "border-ink-base/20 hover:border-ink-base"
+    },
+    accent: {
+      bgSweep: "bg-moss",
+      textIdle: "text-moss",
+      textHover: "text-paper",
+      border: "border-moss/30 hover:border-moss"
+    },
+    canvas: {
+      bgSweep: "bg-paper",
+      textIdle: "text-paper",
+      textHover: "text-ink-base",
+      border: "border-paper/30 hover:border-paper"
+    }
   };
+
+  const activeVariant = variants[variant as keyof typeof variants];
 
   return (
     <motion.a
       href={href}
-      className={`${baseClasses} ${variants[variant as keyof typeof variants]} ${className}`}
-      whileHover={{ scale: 1.02 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       whileTap={{ scale: 0.98 }}
+      className={`relative overflow-hidden px-8 py-4 rounded-full font-medium tracking-wide transition-colors duration-300 flex items-center justify-center gap-3 text-lg border bg-transparent ${activeVariant.border} ${className}`}
     >
-      <span className="relative z-10">{children}</span>
+      {/* Sweeping background */}
+      <motion.div
+        initial={{ x: "-100%" }}
+        animate={{ x: isHovered ? "0%" : "-100%" }}
+        transition={{ duration: 0.4, ease: CUSTOM_EASE }}
+        className={`absolute inset-0 w-full h-full ${activeVariant.bgSweep} origin-left`}
+      />
+
+      <span className={`relative z-10 transition-colors duration-300 ${isHovered ? activeVariant.textHover : activeVariant.textIdle}`}>
+        {children}
+      </span>
       {Icon && (
         <motion.div
-          className="relative z-10"
-          initial={{ x: 0 }}
-          whileHover={{ x: 4 }}
+          className={`relative z-10 transition-colors duration-300 ${isHovered ? activeVariant.textHover : activeVariant.textIdle}`}
+          animate={{ x: isHovered ? 4 : 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
           <Icon className="w-5 h-5" />
@@ -68,7 +99,7 @@ const Navbar = () => (
     </div>
 
     <div className="hidden md:flex items-center gap-10">
-      {['The Crisis', 'Ripple Effect', 'Solution'].map((item) => (
+      {['The Crisis', 'Process', 'Solution'].map((item) => (
         <motion.a
           key={item}
           href={`#${item.toLowerCase().replace(' ', '-')}`}
@@ -80,9 +111,9 @@ const Navbar = () => (
       ))}
     </div>
 
-    <InteractiveButton href="http://localhost:5000" icon={ExternalLink} variant="accent" className="!py-3 !px-7 !text-sm">
+    <PremiumButton href="http://localhost:5000" icon={ExternalLink} variant="accent" className="!py-2.5 !px-6 !text-sm">
       Launch App
-    </InteractiveButton>
+    </PremiumButton>
   </motion.nav>
 );
 
@@ -112,9 +143,9 @@ const Hero = () => {
           </FadeIn>
 
           <FadeIn delay={0.3} className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <InteractiveButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
+            <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
               Launch Prediction Engine
-            </InteractiveButton>
+            </PremiumButton>
           </FadeIn>
         </div>
 
@@ -129,7 +160,7 @@ const Hero = () => {
             <img
               src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2600&auto=format&fit=crop"
               alt="Vast farmland"
-              className="w-full h-full object-cover rounded-none journal-shadow sepia-[10%]"
+              className="w-full h-full object-cover rounded-[2rem] journal-shadow sepia-[10%]"
             />
           </motion.div>
 
@@ -137,12 +168,12 @@ const Hero = () => {
             initial={{ opacity: 0, y: 50, x: -20 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             transition={{ duration: 1.2, ease: CUSTOM_EASE, delay: 0.4 }}
-            className="absolute bottom-0 left-0 w-[60%] h-[50%] z-20 border-8 border-paper"
+            className="absolute bottom-0 left-0 w-[60%] h-[50%] z-20 border-8 border-paper rounded-[2.5rem]"
           >
             <img
               src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2600&auto=format&fit=crop"
               alt="Fresh harvest"
-              className="w-full h-full object-cover sepia-[20%]"
+              className="w-full h-full object-cover rounded-[2rem] sepia-[20%]"
             />
           </motion.div>
         </div>
@@ -160,7 +191,6 @@ const AwarenessSection = () => {
   ];
 
   return (
-    // Redesigned to Sticky Scroll Layout
     <section id="the-crisis" className="relative px-6 lg:px-12 bg-clay-bg text-ink-base border-y border-ink-base/5">
       <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row relative">
 
@@ -226,8 +256,7 @@ const RippleEffectSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8">
           {ripples.map((ripple, i) => (
             <FadeIn key={i} delay={i * 0.15} yOffset={20}>
-              <div className="bg-card p-12 h-full border-t-4 border-t-moss/20 hover:border-t-moss transition-all duration-500 group relative overflow-hidden">
-                {/* Subtle background icon */}
+              <div className="bg-card rounded-[2rem] p-12 h-full border border-ink-base/5 hover:border-moss/30 transition-all duration-500 group relative overflow-hidden">
                 <ripple.icon className="absolute -bottom-10 -right-10 w-48 h-48 text-ink-base/[0.03] group-hover:scale-110 transition-transform duration-700" />
 
                 <div className="mb-8 relative z-10">
@@ -244,6 +273,68 @@ const RippleEffectSection = () => {
   );
 };
 
+// NEW SECTION 1: How it Works
+const ProcessSection = () => {
+  const steps = [
+    { icon: Database, title: "Contextual Data Intake", desc: "We ingest massive amounts of historical sales logs alongside high-variance contextual markers—local weather shifts, major holidays, and expected foot traffic." },
+    { icon: Cpu, title: "The Prediction Engine", desc: "Using an ensemble of Random Forests and Gradient Boosting models, PrepNova analyzes complex patterns invisible to human intuition." },
+    { icon: LineChart, title: "Actionable Precision", desc: "We deliver exact, day-by-day preparation targets directly to your kitchen. Over-prep is eliminated; stockouts are prevented." }
+  ];
+
+  return (
+    <section id="process" className="py-32 px-6 lg:px-12 bg-ink-base text-paper border-t border-ink-base/5 relative overflow-hidden">
+      {/* Decorative large bg text */}
+      <div className="absolute top-0 right-0 max-w-5xl opacity-5 pointer-events-none select-none">
+        <h1 className="font-heading italic text-[20vw] leading-[0.8] tracking-tighter text-right">Machine<br />Learning</h1>
+      </div>
+
+      <div className="max-w-[1600px] mx-auto relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+
+          <div className="lg:col-span-5">
+            <FadeIn>
+              <span className="text-moss font-bold tracking-[0.2em] uppercase text-xs mb-4 block">
+                The Intelligence Process
+              </span>
+              <h2 className="font-heading italic text-6xl md:text-7xl mb-8 text-balance">Data. Not<br />guesswork.</h2>
+              <p className="text-xl text-paper/70 leading-relaxed mb-12">
+                Running a kitchen on intuition inherently creates waste. Our machine learning pipeline shifts operations from reactive guessing to proactive precision.
+              </p>
+              <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="canvas">
+                Launch the Intelligence Tool
+              </PremiumButton>
+            </FadeIn>
+          </div>
+
+          <div className="lg:col-span-7 flex flex-col gap-12">
+            {steps.map((step, i) => (
+              <FadeIn key={i} delay={i * 0.15}>
+                <div className="flex gap-8 group">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 rounded-full border border-paper/20 flex items-center justify-center bg-paper/5 text-earth-accent group-hover:bg-earth-accent group-hover:text-paper group-hover:border-earth-accent transition-all duration-300">
+                      <step.icon className="w-6 h-6" />
+                    </div>
+                    {i !== steps.length - 1 && (
+                      <div className="w-[1px] h-full bg-paper/10 mt-4 group-hover:bg-earth-accent/30 transition-colors"></div>
+                    )}
+                  </div>
+                  <div className="pb-12 pt-2">
+                    <span className="text-paper/40 font-mono text-sm block mb-2">0{i + 1}</span>
+                    <h3 className="font-heading italic text-4xl mb-4 text-paper">{step.title}</h3>
+                    <p className="text-paper/70 leading-relaxed text-lg">{step.desc}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// NEW SECTION 2: Impact Showcase
 const StorySection = () => (
   <section id="solution" className="py-32 px-6 lg:px-12 bg-clay-bg text-ink-base border-t border-ink-base/5">
     <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
@@ -282,9 +373,9 @@ const StorySection = () => (
           </div>
 
           <div className="mt-14">
-            <InteractiveButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
+            <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
               Launch the Intelligence Tool
-            </InteractiveButton>
+            </PremiumButton>
           </div>
         </FadeIn>
       </div>
@@ -292,8 +383,33 @@ const StorySection = () => (
   </section>
 );
 
+const ImpactQuoteSection = () => (
+  <section className="py-40 px-6 lg:px-12 bg-clay-bg text-ink-base border-t border-ink-base/5 border-b">
+    <div className="max-w-[1200px] mx-auto text-center">
+      <FadeIn>
+        <span className="text-earth-accent font-bold tracking-[0.2em] uppercase text-xs mb-10 block">
+          Impact Showcase
+        </span>
+        <h2 className="font-heading italic text-6xl md:text-8xl leading-[1.1] mb-12 text-balance">
+          "By trusting the data over our gut feelings, we reduced our daily food waste by 40% in just three weeks."
+        </h2>
+        <div className="flex items-center justify-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden grayscale border border-ink-base/20">
+            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=200&auto=format&fit=crop" alt="Chef avatar" className="w-full h-full object-cover" />
+          </div>
+          <div className="text-left">
+            <p className="font-bold text-ink-base tracking-wide uppercase text-sm">Marcus V.</p>
+            <p className="text-ink-light text-sm italic">Executive Chef, Metro Catering</p>
+          </div>
+        </div>
+      </FadeIn>
+    </div>
+  </section>
+);
+
+
 const MovementSection = () => (
-  <section className="py-40 px-6 lg:px-12 bg-paper text-ink-base text-center border-t border-ink-base/5 relative overflow-hidden">
+  <section className="py-40 px-6 lg:px-12 bg-paper text-ink-base text-center relative overflow-hidden">
     <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
       <motion.div
         animate={{ rotate: 360 }}
@@ -309,9 +425,9 @@ const MovementSection = () => (
         <p className="text-2xl md:text-3xl text-ink-light leading-relaxed font-light mb-16">
           Through awareness and technology, our goal is simple: <strong className="text-moss font-medium">1 Million Meals Saved by 2027.</strong>
         </p>
-        <InteractiveButton href="http://localhost:5000" icon={ArrowRight} variant="accent" className="mx-auto !text-xl !py-6 !px-12">
+        <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary" className="mx-auto !text-xl px-12 py-5">
           Start Optimizing Now
-        </InteractiveButton>
+        </PremiumButton>
       </FadeIn>
     </div>
   </section>
@@ -388,7 +504,9 @@ export default function App() {
       <Hero />
       <AwarenessSection />
       <RippleEffectSection />
+      <ProcessSection />
       <StorySection />
+      <ImpactQuoteSection />
       <MovementSection />
       <Footer />
     </main>
