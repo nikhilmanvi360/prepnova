@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+@theme {
+    --color-alabaster: #FDFBFA;
+    --color-espresso: #2A2A2A;
+    --color-terracotta: #C85A32;
+    --color-forest: #345E45;
+    --color-forest-light: #4A7A5D;
+    --color-sand: #F2EFE9;
+
+    --font-heading: "Instrument Serif", serif;
+    --font-body: "Inter", sans-serif;
+}
+
+@layer base {
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
+
+    body {
+        background-color: var(--color-alabaster);
+        color: var(--color-espresso);
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+    }
+
+    ::selection {
+        background-color: var(--color-terracotta);
+        color: white;
+    }
+
+    .font-heading {
+        font-family: var(--font-heading);
+    }
+
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+@layer utilities {
+    .subtle-shadow {
+        box-shadow: 0 10px 40px -10px rgba(42, 42, 42, 0.08);
+    }
+}

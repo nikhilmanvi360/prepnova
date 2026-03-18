@@ -1,126 +1,26 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  ArrowUpRight,
-  Play,
-  ChevronDown,
-  Utensils,
-  BarChart3,
+  ArrowRight,
+  Leaf,
   Calendar,
   CloudSun,
-  TrendingUp,
-  AlertCircle,
   Activity,
   Users,
-  Clock,
   CheckCircle2,
-  Cpu
+  AlertCircle,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 
-// --- Global Styles Injection ---
-const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap');
-
-  :root {
-    --font-heading: 'Instrument Serif', serif;
-    --font-body: 'Barlow', sans-serif;
-  }
-
-  body {
-    background-color: #02040A;
-    color: white;
-    font-family: var(--font-body);
-    overflow-x: hidden;
-  }
-
-  ::selection {
-    background-color: rgba(255, 255, 255, 0.3);
-    color: white;
-  }
-
-  .font-heading { font-family: var(--font-heading); }
-  .font-body { font-family: var(--font-body); }
-
-  @layer components {
-    .liquid-glass {
-      background: rgba(255, 255, 255, 0.015);
-      background-blend-mode: luminosity;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: none;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 24px rgba(0, 0, 0, 0.2);
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .liquid-glass::before {
-      content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.05) 80%, rgba(255,255,255,0.2) 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
-    }
-    .liquid-glass-strong {
-      background: rgba(255, 255, 255, 0.02);
-      background-blend-mode: luminosity;
-      backdrop-filter: blur(50px);
-      -webkit-backdrop-filter: blur(50px);
-      border: none;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
-      position: relative; overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .liquid-glass-strong::before {
-      content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.2px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.4) 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
-    }
-  }
-`;
-
-const CUSTOM_EASE = [0.16, 1, 0.3, 1];
-
-const BlurText = ({ text, className, as: Component = "div" }: any) => {
-  const words = text.split(" ");
-  return (
-    <Component className={className}>
-      <motion.span
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-        variants={{
-          visible: { transition: { staggerChildren: 0.04 } }
-        }}
-        className="inline-block"
-      >
-        {words.map((word: string, i: number) => (
-          <motion.span
-            key={i}
-            className="inline-block mr-[0.25em]"
-            variants={{
-              hidden: { filter: 'blur(12px)', opacity: 0, y: 40 },
-              visible: {
-                filter: 'blur(0px)',
-                opacity: 1,
-                y: 0,
-                transition: { ease: CUSTOM_EASE, duration: 0.8 }
-              }
-            }}
-          >
-            {word}
-          </motion.span>
-        ))}
-      </motion.span>
-    </Component>
-  );
-};
+const CUSTOM_EASE = [0.25, 1, 0.5, 1];
 
 const FadeIn = ({ children, className, delay = 0 }: any) => (
   <motion.div
-    initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 1, ease: CUSTOM_EASE, delay }}
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-100px" }}
+    transition={{ duration: 1.2, ease: CUSTOM_EASE, delay }}
     className={className}
   >
     {children}
@@ -132,77 +32,118 @@ const Navbar = () => (
     initial={{ y: -20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 1, ease: CUSTOM_EASE, delay: 0.2 }}
-    className="fixed top-6 left-0 right-0 px-6 lg:px-12 z-50 flex justify-between items-center pointer-events-none"
+    className="absolute top-0 left-0 right-0 px-6 lg:px-12 py-8 z-50 flex justify-between items-center"
   >
-    <div className="liquid-glass rounded-full p-3 pointer-events-auto cursor-pointer hover:bg-white/5 transition-colors flex items-center gap-2 px-6">
-      <Utensils className="w-5 h-5 text-white" />
-      <span className="font-heading italic text-xl tracking-wide">PrepNova</span>
+    <div className="flex items-center gap-2 cursor-pointer group">
+      <Leaf className="w-5 h-5 text-forest group-hover:text-forest-light transition-colors" />
+      <span className="font-heading italic text-2xl tracking-wide text-espresso">PrepNova</span>
     </div>
 
-    <div className="hidden md:flex liquid-glass rounded-full px-8 py-3 items-center gap-8 pointer-events-auto">
-      {['Home', 'Prediction Tool', 'Analytics', 'About'].map((item) => (
-        <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-sm font-medium text-white/70 hover:text-white transition-colors tracking-wide">
+    <div className="hidden md:flex items-center gap-10">
+      {['Mission', 'Prediction', 'Analytics'].map((item) => (
+        <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-medium text-espresso/60 hover:text-terracotta transition-colors tracking-wide uppercase">
           {item}
         </a>
       ))}
     </div>
 
-    <button className="bg-white text-black rounded-full px-6 py-3 flex items-center gap-2 font-medium hover:bg-white/90 transition-colors pointer-events-auto group">
-      Start Prediction
-      <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+    <button className="bg-espresso text-alabaster rounded-full px-7 py-3 flex items-center gap-2 text-sm font-medium hover:bg-espresso/80 transition-colors">
+      Start Optimizing
+      <ArrowRight className="w-4 h-4" />
     </button>
   </motion.nav>
 );
 
 const Hero = () => {
   return (
-    <section id="home" className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.5, ease: CUSTOM_EASE }}
-        className="absolute inset-0 w-full h-full"
-      >
-        <img
-          className="w-full h-full object-cover opacity-40"
-          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
-          alt="Data Analytics Background"
-        />
-      </motion.div>
+    <section className="relative min-h-[90vh] w-full flex flex-col justify-center px-6 lg:px-12 pt-32 pb-20">
+      <div className="max-w-[1600px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#02040A]/60 to-[#02040A]" />
+        {/* Text Content */}
+        <div className="max-w-xl z-10">
+          <FadeIn>
+            <span className="inline-block text-terracotta font-medium tracking-[0.2em] uppercase text-xs mb-6">
+              The True Cost of Inefficiency
+            </span>
+          </FadeIn>
 
-      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-5xl mx-auto mt-20">
-        <FadeIn delay={0.1}>
-          <div className="liquid-glass rounded-full px-4 py-1.5 mb-8 inline-flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-xs uppercase tracking-[0.25em] text-white/80 font-medium">AI-Powered Forecasting</span>
-          </div>
-        </FadeIn>
+          <FadeIn delay={0.1}>
+            <h1 className="font-heading italic text-6xl md:text-8xl text-espresso leading-[0.95] mb-8 text-balance">
+              Nourish People.<br />Not Landfills.
+            </h1>
+          </FadeIn>
 
-        <BlurText
-          as="h1"
-          text="Smart Food Demand Prediction"
-          className="font-heading italic text-6xl md:text-8xl lg:text-9xl text-balance tracking-tight leading-[0.9] mb-8"
-        />
+          <FadeIn delay={0.2}>
+            <p className="text-lg md:text-xl text-espresso/70 leading-relaxed mb-12 max-w-lg">
+              Every day, high-volume kitchens discard perfectly good meals. By harnessing precise demand forecasting, we can drastically reduce commercial food waste at the source.
+            </p>
+          </FadeIn>
 
-        <FadeIn delay={0.4}>
-          <p className="text-lg md:text-xl text-white/70 max-w-2xl text-balance leading-relaxed mb-12">
-            Predict daily meal demand and reduce food waste using advanced AI. Make better meal preparation decisions with precision.
-          </p>
-        </FadeIn>
+          <FadeIn delay={0.3} className="flex items-center gap-6">
+            <a href="#prediction" className="bg-terracotta text-white px-8 py-4 rounded-full font-medium tracking-wide hover:bg-terracotta/90 transition-colors subtle-shadow">
+              Forecast Demand
+            </a>
+            <a href="#mission" className="text-espresso font-medium border-b border-espresso/20 pb-1 hover:border-espresso transition-colors">
+              Read the Facts
+            </a>
+          </FadeIn>
+        </div>
 
-        <FadeIn delay={0.6} className="flex flex-col sm:flex-row items-center gap-6">
-          <a href="#prediction-tool" className="liquid-glass-strong px-8 py-4 rounded-full font-medium tracking-wide hover:bg-white/10 transition-colors w-full sm:w-auto text-center">
-            Start Prediction
-          </a>
-          <button className="flex items-center gap-3 px-8 py-4 rounded-full font-medium text-white/80 hover:text-white transition-colors group w-full sm:w-auto justify-center">
-            <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/50 transition-colors">
-              <Play className="w-4 h-4 ml-0.5" />
-            </div>
-            See How It Works
-          </button>
-        </FadeIn>
+        {/* Image / Visual */}
+        <div className="relative h-[600px] w-full rounded-[2rem] overflow-hidden subtle-shadow">
+          <motion.div
+            initial={{ scale: 1.1, filter: 'blur(10px)' }}
+            animate={{ scale: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1.8, ease: CUSTOM_EASE }}
+            className="w-full h-full"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2600&auto=format&fit=crop"
+              alt="Fresh, organic farm ingredients"
+              className="w-full h-full object-cover"
+            />
+            {/* Soft overlay to blend */}
+            <div className="absolute inset-0 bg-espresso/10 mix-blend-multiply" />
+          </motion.div>
+        </div>
+
+      </div>
+    </section>
+  );
+};
+
+const AwarenessSection = () => {
+  const stats = [
+    { number: "1.3B", unit: "Tons", desc: "Of food produced globally is lost or wasted every single year." },
+    { number: "8%", unit: "GHG", desc: "Of all global greenhouse gas emissions come from food waste." },
+    { number: "$1T", unit: "Lost", desc: "The annual economic value of food wasted globally." }
+  ];
+
+  return (
+    <section id="mission" className="py-32 px-6 lg:px-12 bg-espresso text-alabaster">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="max-w-3xl mb-24">
+          <FadeIn>
+            <h2 className="font-heading italic text-5xl md:text-7xl mb-6">A crisis of abundance.</h2>
+            <p className="text-xl text-alabaster/70 leading-relaxed font-light">
+              We grow enough food to feed the world, but logistics, over-preparation, and poor forecasting cause massive inefficiencies. The restaurant and catering industry alone is responsible for a staggering portion of this loss.
+            </p>
+          </FadeIn>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-alabaster/10 pt-16">
+          {stats.map((stat, i) => (
+            <FadeIn key={i} delay={i * 0.15}>
+              <div className="flex flex-col border-l border-terracotta/30 pl-8">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="font-heading text-6xl md:text-8xl text-terracotta">{stat.number}</span>
+                  <span className="text-xl font-medium text-alabaster/50 uppercase tracking-widest">{stat.unit}</span>
+                </div>
+                <p className="text-alabaster/80 text-lg leading-relaxed max-w-xs">{stat.desc}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -223,189 +164,157 @@ const PredictionInterface = () => {
   };
 
   return (
-    <section id="prediction-tool" className="py-32 px-6 lg:px-12 relative max-w-[1600px] mx-auto">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
+    <section id="prediction" className="py-32 px-6 lg:px-12 max-w-[1600px] mx-auto">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-16 items-start">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start relative z-10">
-
-        {/* Input Form */}
-        <div>
+        {/* Form Column */}
+        <div className="xl:col-span-5">
           <FadeIn>
-            <h2 className="font-heading italic text-5xl md:text-6xl tracking-tight mb-4">Daily Context</h2>
-            <p className="text-white/60 mb-12 text-lg">Input today's operational data to generate an accurate demand forecast.</p>
+            <span className="text-forest font-medium tracking-[0.2em] uppercase text-xs mb-4 block">
+              Operational Context
+            </span>
+            <h2 className="font-heading italic text-5xl md:text-6xl text-espresso mb-6">Precision Forecasting</h2>
+            <p className="text-espresso/60 text-lg mb-12 pb-12 border-b border-espresso/10">
+              Input today's variables to generate an optimized meal preparation plan. By aligning prep with actual demand, we stop waste before it happens.
+            </p>
           </FadeIn>
 
-          <FadeIn delay={0.2} className="liquid-glass p-8 md:p-10 rounded-3xl">
-            <form onSubmit={handlePredict} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Date</label>
+          <FadeIn delay={0.2}>
+            <form onSubmit={handlePredict} className="space-y-8">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col gap-3">
+                  <label className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso/50">Date</label>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                    <input type="date" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-white/30 transition-colors" required />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso/40" />
+                    <input type="date" className="w-full bg-sand border border-espresso/5 rounded-xl py-4 pl-12 pr-4 text-espresso focus:outline-none focus:border-forest/30 transition-colors" required />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Day of Week</label>
-                  <select className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white/30 transition-colors appearance-none" required>
-                    <option value="" className="bg-[#02040A]">Select Day</option>
-                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                      <option key={day} value={day} className="bg-[#02040A]">{day}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Weather</label>
+                <div className="flex flex-col gap-3">
+                  <label className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso/50">Weather</label>
                   <div className="relative">
-                    <CloudSun className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                    <select className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-white/30 transition-colors appearance-none" required>
-                      <option value="" className="bg-[#02040A]">Select Weather</option>
-                      <option value="sunny" className="bg-[#02040A]">Sunny / Clear</option>
-                      <option value="rainy" className="bg-[#02040A]">Rainy</option>
-                      <option value="cloudy" className="bg-[#02040A]">Cloudy</option>
-                      <option value="snow" className="bg-[#02040A]">Snow</option>
+                    <CloudSun className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso/40" />
+                    <select className="w-full bg-sand border border-espresso/5 rounded-xl py-4 pl-12 pr-4 text-espresso focus:outline-none focus:border-forest/30 transition-colors appearance-none" required>
+                      <option value="">Select condition</option>
+                      <option value="sunny">Sunny / Clear</option>
+                      <option value="rainy">Rainy</option>
+                      <option value="cloudy">Cloudy</option>
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Special Event</label>
-                  <select className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-white/30 transition-colors appearance-none" required>
-                    <option value="none" className="bg-[#02040A]">None</option>
-                    <option value="holiday" className="bg-[#02040A]">Public Holiday</option>
-                    <option value="local" className="bg-[#02040A]">Local Event / Festival</option>
-                    <option value="promotion" className="bg-[#02040A]">Store Promotion</option>
-                  </select>
-                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-[0.2em] text-white/60">Expected Customers (Est.)</label>
+              <div className="flex flex-col gap-3">
+                <label className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso/50">Local Events</label>
+                <select className="w-full bg-sand border border-espresso/5 rounded-xl py-4 px-4 text-espresso focus:outline-none focus:border-forest/30 transition-colors appearance-none" required>
+                  <option value="none">Standard Day (None)</option>
+                  <option value="holiday">Public Holiday</option>
+                  <option value="festival">City Festival</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-3 pb-8 border-b border-espresso/10">
+                <label className="text-xs font-semibold uppercase tracking-[0.15em] text-espresso/50">Initial Estimate (Customers)</label>
                 <div className="relative">
-                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                  <input type="number" placeholder="e.g. 500" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors" required />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Prev. Day Demand</label>
-                  <input type="number" placeholder="Meals sold yesterday" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors" required />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-white/60">Prev. Week Demand</label>
-                  <input type="number" placeholder="Meals sold last week" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors" required />
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso/40" />
+                  <input type="number" placeholder="Your baseline expectation (e.g. 350)" className="w-full bg-sand border border-espresso/5 rounded-xl py-4 pl-12 pr-4 text-espresso focus:outline-none focus:border-forest/30 transition-colors placeholder:text-espresso/30" required />
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={isPredicting}
-                className="w-full bg-white text-black rounded-xl py-4 font-medium hover:bg-white/90 transition-colors mt-4 flex justify-center items-center gap-2 disabled:opacity-70"
+                className="w-full bg-forest text-alabaster rounded-xl py-5 font-medium tracking-wide hover:bg-forest-light transition-colors mt-8 flex justify-center items-center gap-3 disabled:opacity-50 subtle-shadow"
               >
-                {isPredicting ? (
-                  <>
-                    <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                    Generating Prediction...
-                  </>
-                ) : (
-                  <>
-                    <Activity className="w-5 h-5" />
-                    Predict Meals
-                  </>
-                )}
+                {isPredicting ? 'Analyzing dataset...' : 'Generate Optimized Plan'}
+                {!isPredicting && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
           </FadeIn>
         </div>
 
-        {/* Results Section */}
-        <div className="h-full flex flex-col justify-center">
-          <AnimatePresence mode="wait">
-            {!showResults && !isPredicting && (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="liquid-glass rounded-[2.5rem] h-[500px] flex flex-col items-center justify-center text-center p-10 border border-white/5"
-              >
-                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                  <BarChart3 className="w-10 h-10 text-white/20" />
-                </div>
-                <h3 className="font-heading italic text-3xl mb-2 text-white/40">Awaiting Data</h3>
-                <p className="text-white/30 max-w-xs">Fill out the operational context form to generate your daily demand prediction.</p>
-              </motion.div>
-            )}
+        {/* Results Column */}
+        <div className="xl:col-span-7 h-full flex flex-col justify-center">
+          <div className="bg-sand rounded-[2rem] p-8 md:p-16 h-full min-h-[600px] flex flex-col justify-center border border-espresso/5 subtle-shadow">
+            <AnimatePresence mode="wait">
 
-            {isPredicting && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                className="liquid-glass-strong rounded-[2.5rem] h-[500px] flex flex-col items-center justify-center text-center p-10 border border-blue-500/20"
-              >
-                <div className="relative w-24 h-24 mb-8">
-                  <div className="absolute inset-0 border-t-2 border-blue-400 rounded-full animate-spin" style={{ animationDuration: '1s' }} />
-                  <div className="absolute inset-2 border-r-2 border-indigo-400 rounded-full animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }} />
-                  <div className="absolute inset-4 border-b-2 border-white/50 rounded-full animate-spin" style={{ animationDuration: '2s' }} />
-                  <Cpu className="absolute inset-0 m-auto w-6 h-6 text-blue-400 animate-pulse" />
-                </div>
-                <h3 className="font-heading italic text-3xl mb-2 text-white">Analyzing Patterns</h3>
-                <p className="text-white/60 max-w-xs">Running neural networks against historical data and current context...</p>
-              </motion.div>
-            )}
-
-            {showResults && (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="liquid-glass-strong rounded-[2.5rem] p-10 border border-emerald-500/20 relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
-
-                <div className="flex items-center gap-2 mb-8">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  <span className="text-xs uppercase tracking-[0.2em] text-emerald-400/80 font-medium">Prediction Complete</span>
-                </div>
-
-                <div className="mb-10">
-                  <p className="text-white/60 text-sm uppercase tracking-[0.1em] mb-2">Recommended Meals to Prepare</p>
-                  <div className="flex items-baseline gap-4">
-                    <h3 className="font-heading italic text-7xl md:text-8xl tracking-tight text-white">420</h3>
-                    <span className="text-xl text-white/40 font-medium">meals</span>
+              {!showResults && !isPredicting && (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center max-w-sm mx-auto"
+                >
+                  <div className="w-16 h-16 rounded-full bg-espresso/5 flex items-center justify-center mx-auto mb-6">
+                    <Leaf className="w-8 h-8 text-espresso/20" />
                   </div>
-                </div>
+                  <h3 className="font-heading italic text-3xl mb-4 text-espresso/40">Awaiting Context</h3>
+                  <p className="text-espresso/40">Provide todays parameters to generate a scientifically backed preparation volume.</p>
+                </motion.div>
+              )}
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertCircle className="w-4 h-4 text-blue-400" />
-                      <span className="text-xs uppercase tracking-[0.1em] text-white/60">Confidence</span>
+              {isPredicting && (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col justify-center max-w-xs mx-auto"
+                >
+                  <div className="flex flex-col gap-6">
+                    <motion.div
+                      className="h-px bg-terracotta w-full origin-left"
+                      animate={{ scaleX: [0, 1, 0], x: ["0%", "0%", "100%"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <h3 className="font-heading italic text-3xl text-espresso text-center">Evaluating...</h3>
+                    <p className="text-espresso/50 text-center text-sm uppercase tracking-widest animate-pulse">Running Random Forest Matrix</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {showResults && (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: CUSTOM_EASE }}
+                  className="flex flex-col h-full"
+                >
+                  <div className="flex items-center gap-2 mb-12 pb-6 border-b border-espresso/10">
+                    <CheckCircle2 className="w-5 h-5 text-forest" />
+                    <span className="text-xs uppercase tracking-[0.2em] text-forest font-bold">Analysis Complete</span>
+                  </div>
+
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-espresso/50 text-sm uppercase tracking-[0.2em] mb-4 font-semibold">Optimal Prep Volume</p>
+                    <div className="flex items-baseline gap-4 mb-4">
+                      <h3 className="font-heading italic text-7xl md:text-9xl text-espresso">420</h3>
+                      <span className="text-2xl text-espresso/40 font-medium">meals</span>
                     </div>
-                    <p className="text-2xl font-medium text-white">High (94%)</p>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-4 h-4 text-emerald-400" />
-                      <span className="text-xs uppercase tracking-[0.1em] text-white/60">Comparison</span>
-                    </div>
-                    <p className="text-2xl font-medium text-emerald-400">+10% <span className="text-sm text-white/40">vs avg</span></p>
-                  </div>
-                </div>
+                    <p className="text-terracotta font-medium mb-12">-10% from baseline estimate (Saving 40 meals from waste)</p>
 
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 relative z-10">
-                  <p className="text-sm text-emerald-100/80 leading-relaxed">
-                    <strong>Insight:</strong> The sunny weather combined with the local event is driving a 10% expected increase over standard weekday demand. Prepare extra prep-heavy ingredients early.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    <div className="grid grid-cols-2 gap-8 border-t border-espresso/10 pt-8">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Activity className="w-4 h-4 text-espresso/40" />
+                          <span className="text-xs uppercase tracking-[0.1em] text-espresso/40 font-semibold">Model Confidence</span>
+                        </div>
+                        <p className="text-2xl font-medium text-espresso">94% <span className="text-sm text-espresso/40 inline-block ml-1">High</span></p>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="w-4 h-4 text-espresso/40" />
+                          <span className="text-xs uppercase tracking-[0.1em] text-espresso/40 font-semibold">Primary Driver</span>
+                        </div>
+                        <p className="text-lg font-medium text-espresso py-1">Weather (Rainy) dampens foot traffic.</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
       </div>
@@ -413,93 +322,73 @@ const PredictionInterface = () => {
   );
 };
 
-const AnalyticsDashboard = () => {
-  const charts = [
-    { title: "Meals by Weekday", desc: "Average demand distribution", span: "md:col-span-2", icon: Calendar },
-    { title: "Demand Trend", desc: "30-day historical volume", span: "md:col-span-1", icon: TrendingUp },
-    { title: "Weather Impact", desc: "Sales correlation by condition", span: "md:col-span-1", icon: CloudSun },
-    { title: "Event Lift", desc: "Volume increase during events", span: "md:col-span-2", icon: Activity }
-  ];
+const AnalyticsPlaceholder = () => (
+  <section id="analytics" className="py-24 px-6 lg:px-12 max-w-[1600px] mx-auto border-t border-espresso/10">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+      <FadeIn>
+        <h2 className="font-heading italic text-4xl md:text-6xl text-espresso">Historical Impact</h2>
+        <p className="text-espresso/60 mt-4 text-lg max-w-xl">
+          Visualizing the long-term effect of optimized preparation. By analyzing past cycles, we continuously refine future predictions.
+        </p>
+      </FadeIn>
+    </div>
 
-  return (
-    <section id="analytics" className="py-32 px-6 lg:px-12 max-w-[1600px] mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
-        <FadeIn>
-          <h2 className="font-heading italic text-5xl md:text-7xl tracking-tight">Demand Analytics</h2>
-          <p className="text-white/60 mt-4 text-lg max-w-xl">Visualize historical patterns to better understand the factors driving your daily food demand.</p>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {[1, 2, 3].map((i) => (
+        <FadeIn key={i} delay={i * 0.15} className="bg-alabaster border border-espresso/10 p-8 rounded-2xl h-64 flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div className="w-8 h-8 rounded-full bg-sand flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-espresso/40" />
+            </div>
+            <span className="text-xs uppercase text-espresso/30 font-bold tracking-widest">Chart {i}</span>
+          </div>
+          <div className="mt-auto">
+            <div className="h-2 w-full bg-sand rounded-full mb-3 overflow-hidden">
+              <div className="h-full bg-forest opacity-20" style={{ width: `${60 + (i * 10)}%` }} />
+            </div>
+            <div className="h-2 w-3/4 bg-sand rounded-full" />
+          </div>
         </FadeIn>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {charts.map((chart, i) => (
-          <FadeIn key={i} delay={i * 0.1} className={`liquid-glass p-8 rounded-3xl flex flex-col ${chart.span} min-h-[300px]`}>
-            <div className="flex items-center gap-3 mb-2">
-              <chart.icon className="w-5 h-5 text-white/50" />
-              <h3 className="text-xl font-medium tracking-wide">{chart.title}</h3>
-            </div>
-            <p className="text-xs uppercase tracking-[0.2em] text-white/40 mb-8">{chart.desc}</p>
-
-            {/* Placeholder for actual charts */}
-            <div className="flex-grow flex items-center justify-center border border-white/5 border-dashed rounded-xl bg-white/[0.02]">
-              <span className="text-white/20 text-sm font-medium tracking-widest uppercase">Chart Visualization</span>
-            </div>
-          </FadeIn>
-        ))}
-      </div>
-    </section>
-  );
-};
+      ))}
+    </div>
+  </section>
+);
 
 const Footer = () => (
-  <footer className="border-t border-white/10 pt-24 pb-12 px-6 lg:px-12 max-w-[1600px] mx-auto mt-20">
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 lg:gap-12">
+  <footer className="bg-espresso text-alabaster pt-24 pb-12 px-6 lg:px-12">
+    <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12">
 
-      <div className="lg:col-span-2">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="liquid-glass rounded-full p-2">
-            <Utensils className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-medium tracking-[0.2em] uppercase text-sm">PrepNova</span>
-        </div>
-
-        <h2 className="font-heading italic text-5xl md:text-6xl tracking-tight mb-10 max-w-md text-balance">
-          Optimize your kitchen.
+      <div>
+        <h2 className="font-heading italic text-5xl md:text-6xl mb-8 max-w-md text-balance">
+          Optimize your kitchen. Save the planet.
         </h2>
-
-        <div className="liquid-glass rounded-full p-2 flex max-w-md">
-          <input
-            type="email"
-            placeholder="Enter email for updates"
-            className="bg-transparent border-none outline-none px-6 w-full text-white placeholder:text-white/40 font-body"
-          />
-          <button className="bg-white text-black rounded-full px-6 py-3 font-medium hover:bg-white/90 transition-colors whitespace-nowrap">
-            Subscribe
-          </button>
+        <div className="flex items-center gap-2 mb-12">
+          <Leaf className="w-5 h-5 text-terracotta" />
+          <span className="font-medium tracking-[0.2em] uppercase text-sm text-terracotta">PrepNova</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-6">
-        <h4 className="text-xs uppercase tracking-[0.2em] text-white/40 font-medium mb-2">Platform</h4>
-        {['Prediction Tool', 'Analytics Dashboard', 'Data Export', 'API Access'].map(link => (
-          <a key={link} href="#" className="text-white/70 hover:text-white transition-colors w-fit">{link}</a>
-        ))}
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <h4 className="text-xs uppercase tracking-[0.2em] text-white/40 font-medium mb-2">Company</h4>
-        {['About Us', 'Case Studies', 'Pricing', 'Contact'].map(link => (
-          <a key={link} href="#" className="text-white/70 hover:text-white transition-colors w-fit">{link}</a>
-        ))}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="flex flex-col gap-4">
+          <h4 className="text-xs uppercase tracking-[0.2em] text-alabaster/40 font-bold mb-4">Platform</h4>
+          {['Prediction Engine', 'Analytics Dashboard', 'API Access'].map(link => (
+            <a key={link} href="#" className="text-alabaster/70 hover:text-white transition-colors text-sm">{link}</a>
+          ))}
+        </div>
+        <div className="flex flex-col gap-4">
+          <h4 className="text-xs uppercase tracking-[0.2em] text-alabaster/40 font-bold mb-4">Company</h4>
+          {['Our Mission', 'Case Studies', 'Contact'].map(link => (
+            <a key={link} href="#" className="text-alabaster/70 hover:text-white transition-colors text-sm">{link}</a>
+          ))}
+        </div>
       </div>
 
     </div>
 
-    <div className="mt-32 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-white/50">
-      <p>&copy; 2026 PrepNova Analytics. All rights reserved.</p>
-
+    <div className="max-w-[1600px] mx-auto mt-32 pt-8 border-t border-alabaster/10 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-alabaster/40">
+      <p>&copy; 2026 PrepNova Analytics.</p>
       <div className="flex gap-6">
         <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-        <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
       </div>
     </div>
   </footer>
@@ -507,16 +396,13 @@ const Footer = () => (
 
 export default function App() {
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
-      <main className="min-h-screen selection:bg-white/30 selection:text-white">
-        <Navbar />
-        <Hero />
-        <PredictionInterface />
-        <AnalyticsDashboard />
-        <Footer />
-      </main>
-    </>
+    <main className="min-h-screen bg-alabaster text-espresso font-body">
+      <Navbar />
+      <Hero />
+      <AwarenessSection />
+      <PredictionInterface />
+      <AnalyticsPlaceholder />
+      <Footer />
+    </main>
   );
 }
-
