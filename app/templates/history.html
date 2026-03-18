@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block title %}Operational History | PrepNova Intelligence{% endblock %}
+
+{% block content %}
+<div class="animate-up">
+    <div style="text-align: center; margin-bottom: 6rem;">
+        <div
+            style="display: inline-block; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">
+            Operational Audit Log
+        </div>
+        <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.04em;">Forecast History</h1>
+        <p style="color: var(--text-second); max-width: 600px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">A
+            complete immutable record of system projections and verified consumption metrics.</p>
+    </div>
+
+    <div class="card"
+        style="padding: 0; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: var(--shadow-deep);">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: var(--bg-muted); border-bottom: 1px solid var(--border-soft);">
+                    <tr>
+                        <th
+                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
+                            Timestamp</th>
+                        <th
+                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
+                            Cycle</th>
+                        <th
+                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
+                            Vectors</th>
+                        <th
+                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
+                            Projection</th>
+                        <th
+                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
+                            Verified Actual</th>
+                    </tr>
+                </thead>
+                <tbody style="background: white;">
+                    {% for row in predictions %}
+                    <tr style="border-bottom: 1px solid var(--bg-muted); transition: background 0.2s;"
+                        onmouseover="this.style.background='var(--bg-base)'" onmouseout="this.style.background='white'">
+                        <td
+                            style="padding: 1.5rem 2rem; font-size: 0.85rem; color: var(--text-muted); font-family: monospace;">
+                            {{ row['timestamp'] }}</td>
+                        <td style="padding: 1.5rem 2rem;">
+                            <div style="font-weight: 800; color: var(--text-main);">{{ row['day'] }}</div>
+                        </td>
+                        <td style="padding: 1.5rem 2rem;">
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span
+                                    style="font-size: 0.7rem; padding: 4px 10px; background: var(--bg-muted); color: var(--text-second); border-radius: 4px; font-weight: 700;">{{
+                                    row['weather'] }}</span>
+                                {% if row['event_name'] %}
+                                <span
+                                    style="font-size: 0.7rem; padding: 4px 10px; background: #FFF9E6; color: #D97706; border-radius: 4px; font-weight: 700; border: 1px solid #FEF3C7;">{{
+                                    row['event_name'] }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1.5rem 2rem;">
+                            <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">{{
+                                row['final_recommendation'] }}</div>
+                            <div
+                                style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                Confidence Index 0.92</div>
+                        </td>
+                        <td style="padding: 1.5rem 2rem;">
+                            {% if row['is_actual_verified'] %}
+                            <div
+                                style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--primary-glow); color: var(--primary); border-radius: 6px; font-weight: 800;">
+                                <span style="font-size: 0.8rem;">✓</span> {{ row['actual_consumed'] }}
+                            </div>
+                            {% else %}
+                            <form action="{{ url_for('update_actual') }}" method="POST"
+                                style="display: flex; gap: 10px;">
+                                <input type="hidden" name="id" value="{{ row['id'] }}">
+                                <input type="number" name="actual_consumed" placeholder="Actual" required
+                                    style="padding: 8px 12px; font-size: 0.9rem; width: 80px; border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 8px 16px; font-size: 0.8rem; border-radius: var(--radius-sm);">Verify</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% endblock %}

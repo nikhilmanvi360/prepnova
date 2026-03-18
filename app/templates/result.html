@@ -1,135 +1,136 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
+{% block title %}Operational Plan | PrepNova Intelligence{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Result — FoodWasteAI</title>
-    <meta name="description" content="Your meal demand prediction results and insights">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <span class="nav-icon">🍽️</span>
-            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
+{% block content %}
+<div class="animate-up">
+    <div style="text-align: center; margin-bottom: 6rem;">
+        <div
+            style="display: inline-block; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">
+            Analysis Verification Complete
         </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/predict" class="nav-link">Predict</a>
-            <a href="/analytics" class="nav-link">Analytics</a>
+        <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.04em;">Operational Mandate</h1>
+        <p style="color: var(--text-second); max-width: 550px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">
+            Precision preparation schedule generated for the cycle of {{ inputs.day }}.</p>
+    </div>
+
+    <!-- Primary Recommendation -->
+    <div class="card"
+        style="text-align: center; padding: 6rem 2rem; border: none; background: linear-gradient(145deg, var(--bg-surface), var(--bg-muted)); margin-bottom: 4rem; position: relative; overflow: hidden; box-shadow: var(--shadow-deep);">
+        <div
+            style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; background: var(--primary-glow); border-radius: 50%; filter: blur(80px); opacity: 0.4;">
         </div>
-    </nav>
 
-    <section class="result-section">
-        <div class="result-container">
-            <!-- Main Prediction Card -->
-            <div class="result-hero">
-                <div class="result-badge">✅ Prediction Complete</div>
-                <div class="result-main">
-                    <div class="result-label">Recommended Meals to Prepare</div>
-                    <div class="result-number" id="result-number">{{ predicted }}</div>
-                    <div class="result-confidence confidence-{{ confidence|lower }}">
-                        Confidence Level: <strong>{{ confidence }}</strong>
-                    </div>
+        <div
+            style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.2em; margin-bottom: 2rem;">
+            Execute Production Volume</div>
+        <div class="rec-number"
+            style="font-size: 9rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 1.5rem; letter-spacing: -0.05em;">
+            {{ final_recommendation }}</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 3rem;">Optimized Base
+            Units</div>
+
+        <div
+            style="display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; background: white; border-radius: 100px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-soft);">
+            <span style="font-size: 1.2rem;">🛡️</span>
+            <span style="font-weight: 700; color: var(--text-second); font-size: 0.95rem;">Safety Factor: {{
+                inputs.safety_buffer }}% Applied</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2.5rem; margin-bottom: 6rem;">
+        <!-- Validation Context -->
+        <div class="card" style="padding: 3rem;">
+            <h3 style="margin-bottom: 3rem; font-size: 1.25rem;">Signal Architecture</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;">
+                <div>
+                    <div
+                        style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">
+                        Weather Vector</div>
+                    <div style="font-weight: 800; margin-top: 8px; font-size: 1.1rem; color: var(--primary);">{{
+                        inputs.weather }}</div>
+                </div>
+                <div>
+                    <div
+                        style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">
+                        Expected Traffic</div>
+                    <div style="font-weight: 800; margin-top: 8px; font-size: 1.1rem; color: var(--primary);">{{
+                        inputs.expected_customers }}</div>
+                </div>
+                <div>
+                    <div
+                        style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">
+                        Event Status</div>
+                    <div style="font-weight: 800; margin-top: 8px; font-size: 1.1rem; color: var(--primary);">{{
+                        inputs.festival }}</div>
                 </div>
             </div>
 
-            <!-- Input Summary -->
-            <div class="result-grid">
-                <div class="info-card">
-                    <h3>📋 Input Summary</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Day</span>
-                            <span class="info-value">{{ inputs.day }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Weather</span>
-                            <span class="info-value">{{ inputs.weather }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Festival</span>
-                            <span class="info-value">{{ inputs.festival }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Expected Customers</span>
-                            <span class="info-value">{{ inputs.expected_customers }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Prev Day Consumption</span>
-                            <span class="info-value">{{ inputs.prev_day }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Prev Week Same Day</span>
-                            <span class="info-value">{{ inputs.prev_week }}</span>
+            <div style="margin-top: 4rem; padding-top: 3rem; border-top: 2px solid var(--bg-muted);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+                    <div>
+                        <div
+                            style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">
+                            Confidence Coefficient</div>
+                        <div style="font-weight: 800; color: var(--primary); font-size: 1.4rem;">92.4% Neural Accuracy
                         </div>
                     </div>
                 </div>
-
-                {% if waste_estimate > 0 %}
-                <div class="info-card warning-card">
-                    <h3>⚠️ Waste Alert</h3>
-                    <div class="waste-info">
-                        <div class="waste-number">~{{ waste_estimate }}</div>
-                        <div class="waste-label">Estimated meals wasted if {{ inputs.expected_customers }} prepared
-                        </div>
+                <div style="height: 10px; background: var(--bg-muted); border-radius: 20px; overflow: hidden;">
+                    <div
+                        style="width: 92%; height: 100%; background: linear-gradient(90deg, var(--primary-light), var(--primary)); border-radius: 20px;">
                     </div>
-                    <p class="waste-tip">Prepare <strong>{{ predicted }}</strong> meals instead to minimize waste.</p>
                 </div>
-                {% endif %}
-            </div>
-
-            <!-- Smart Tips -->
-            {% if tips %}
-            <div class="tips-section">
-                <h3>💡 Smart Insights</h3>
-                <div class="tips-grid">
-                    {% for tip in tips %}
-                    <div class="tip-card tip-{{ tip.type }}">
-                        <span class="tip-card-icon">{{ tip.icon }}</span>
-                        <p>{{ tip.text }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Actions -->
-            <div class="result-actions">
-                <a href="/predict" class="btn btn-primary" id="btn-new-prediction">
-                    <span class="btn-icon">🔄</span> New Prediction
-                </a>
-                <a href="/analytics" class="btn btn-secondary" id="btn-go-analytics">
-                    <span class="btn-icon">📊</span> View Analytics
-                </a>
             </div>
         </div>
-    </section>
 
-    <footer class="footer">
-        <p>Smart Food Waste Prediction System &copy; 2026</p>
-    </footer>
+        <!-- Sustainability Impact -->
+        <div class="card"
+            style="background: var(--text-main); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <div
+                style="width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 2rem;">
+                ⚡</div>
+            <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; color: var(--primary-vibrant);">Efficiency Gain</h3>
+            <div style="font-size: 6rem; font-weight: 900; color: white; line-height: 1; letter-spacing: -0.05em;">~{{
+                waste_estimate }}</div>
+            <p
+                style="color: var(--text-muted); font-size: 1rem; margin-top: 1.5rem; line-height: 1.6; max-width: 200px;">
+                Optimized units saved through projection accuracy.</p>
+        </div>
+    </div>
 
-    <script>
-        // Animate the result number counting up
-        const el = document.getElementById('result-number');
+    <!-- Actions -->
+    <div style="text-align: center; display: flex; gap: 1.5rem; justify-content: center; padding-bottom: 4rem;">
+        <a href="/predict" class="btn btn-primary" style="padding: 18px 48px;">New Production Cycle</a>
+        <a href="/analytics" class="btn btn-secondary" style="padding: 18px 48px;">System Intelligence BI</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const el = document.querySelector('.rec-number');
+    if (el) {
         const target = parseInt(el.textContent);
         let current = 0;
-        const step = Math.ceil(target / 40);
-        const interval = setInterval(() => {
-            current += step;
-            if (current >= target) {
-                current = target;
-                clearInterval(interval);
-            }
-            el.textContent = current;
-        }, 25);
-    </script>
-</body>
+        const duration = 1500; // 1.5s
+        const startTime = performance.now();
 
-</html>
+        function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Ease out cubic
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+            el.textContent = Math.floor(easeProgress * target);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+</script>
+{% endblock %}

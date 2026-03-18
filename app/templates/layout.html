@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PrepNova | Elite Operational Intelligence{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="/" class="brand-link">
+                <span style="color: var(--primary-vibrant);">✦</span> PrepNova
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
+            <li><a href="/predict" class="nav-link {% if request.path == '/predict' %}active{% endif %}">Engine</a></li>
+            <li><a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}">History</a>
+            </li>
+            <li><a href="/analytics"
+                    class="nav-link {% if request.path == '/analytics' %}active{% endif %}">Analytics</a></li>
+        </ul>
+    </nav>
+
+    <main class="animate-up">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <h2>PrepNova</h2>
+                <p>Advanced supply chain optimization using state-of-the-art machine learning models. Built for
+                    precision, designed for sustainability.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="/predict">Demand Engine</a></li>
+                    <li><a href="/analytics">Analytics BI</a></li>
+                    <li><a href="/history">Operational History</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Global</h3>
+                <ul>
+                    <li><a href="#">Security Protocol</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                    <li><a href="#">Cloud Status</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Connect</h3>
+                <ul>
+                    <li><a href="#">Intelligence Hub</a></li>
+                    <li><a href="#">Operations Team</a></li>
+                    <li><a href="#">Request Audit</a></li>
+                </ul>
+            </div>
+        </div>
+        <div
+            style="text-align: center; margin-top: 6rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em;">
+            <p>&copy; 2026 PrepNova Intelligence Systems. Distributed Operational Protocol Enabled.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
