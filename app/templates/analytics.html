@@ -1,129 +1,85 @@
-{% extends "layout.html" %}
-{% block title %}Analytics | PrepNova Intelligence{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<div class="animate-up">
-    <div style="text-align: center; margin-bottom: 6rem;">
-        <div
-            style="display: inline-block; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">
-            BI Operational Dashboard
-        </div>
-        <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.04em;">System Analytics</h1>
-        <p style="color: var(--text-second); max-width: 600px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">
-            Comprehensive breakdown of historical patterns and model performance metrics across 1,000+ operational
-            cycles.</p>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard — FoodWasteAI</title>
+    <meta name="description" content="Analytics dashboard with insights from food consumption data">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
 
-    <!-- ROI Metrics -->
-    <div class="metrics-row">
-        <div class="metric-card animate-up delay-1">
-            <div style="font-size: 1.8rem; margin-bottom: 1rem;">💰</div>
-            <div class="metric-value" id="roi-money">₹0</div>
-            <div class="metric-label">Projected Financial Recovery</div>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🍽️</span>
+            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
         </div>
-        <div class="metric-card animate-up delay-2">
-            <div style="font-size: 1.8rem; margin-bottom: 1rem;">🌍</div>
-            <div class="metric-value" id="roi-co2">0<span
-                    style="font-size: 1.25rem; margin-left: 4px; opacity: 0.5;">kg</span></div>
-            <div class="metric-label">CO2 Prevention Metric</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/predict" class="nav-link">Predict</a>
+            <a href="/analytics" class="nav-link active">Analytics</a>
         </div>
-        <div class="metric-card animate-up delay-3">
-            <div style="font-size: 1.8rem; margin-bottom: 1rem;">🍽️</div>
-            <div class="metric-value" id="roi-meals">0</div>
-            <div class="metric-label">Total Meals Optimized</div>
-        </div>
-    </div>
+    </nav>
 
-    <!-- Engine Intelligence -->
-    <div class="card animate-up delay-1"
-        style="margin-bottom: 4rem; background: linear-gradient(135deg, var(--bg-surface), var(--bg-muted));">
-        <h3 style="margin-bottom: 2.5rem; font-size: 1.5rem;">Engine Intelligence <span
-                style="font-weight: 400; color: var(--text-muted); font-size: 0.9rem; margin-left: 10px;">Ensemble
-                Performance Benchmarks</span></h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-            {% for name, metrics in data.model_results.items() %}
-            <div
-                style="padding: 2rem; border-radius: var(--radius-md); border: 2px solid {{ 'var(--primary)' if name == data.best_model_name else 'var(--border-soft)' }}; background: {{ 'var(--bg-surface)' if name == data.best_model_name else 'transparent' }}; box-shadow: {{ 'var(--shadow-mid)' if name == data.best_model_name else 'none' }};">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <div
-                        style="font-weight: 800; color: {{ 'var(--primary)' if name == data.best_model_name else 'var(--text-main)' }};">
-                        {{ name }}</div>
-                    {% if name == data.best_model_name %}
-                    <span
-                        style="font-size: 0.65rem; padding: 4px 8px; background: var(--primary); color: white; border-radius: 4px; text-transform: uppercase;">Primary</span>
-                    {% endif %}
-                </div>
-                <div style="display: flex; gap: 1rem;">
-                    <div>
-                        <div
-                            style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">
-                            MAE</div>
-                        <div style="font-size: 1.1rem; font-weight: 800;">{{ "%.1f"|format(metrics.MAE) }}</div>
+    <section class="analytics-section">
+        <div class="analytics-header">
+            <div class="form-badge">📊 Data Analytics</div>
+            <h1>Analytics Dashboard</h1>
+            <p>Insights from {{ total_rows }} data points of historical food consumption.</p>
+        </div>
+
+        <!-- Model Performance Summary -->
+        <div class="model-summary">
+            <div class="model-card best-model">
+                <div class="model-badge">🏆 Best Model</div>
+                <h3>{{ best_model }}</h3>
+                <div class="model-stats">
+                    {% for name, metrics in model_results.items() %}
+                    <div class="model-stat {{ 'highlight' if name == best_model else '' }}">
+                        <span class="model-name">{{ name }}</span>
+                        <span class="model-metric">MAE: {{ "%.1f"|format(metrics.MAE) }}</span>
+                        <span class="model-metric">RMSE: {{ "%.1f"|format(metrics.RMSE) }}</span>
                     </div>
-                    <div>
-                        <div
-                            style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">
-                            RMSE</div>
-                        <div style="font-size: 1.1rem; font-weight: 800;">{{ "%.1f"|format(metrics.RMSE) }}</div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
         </div>
-    </div>
 
-    <!-- Charts Grid -->
-    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-        <div class="card animate-up delay-1">
-            <h3 style="margin-bottom: 2rem; font-size: 1.2rem;">👥 Demand Analysis <span
-                    style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem; margin-left: 10px;">Customer
-                    vs Meal Volume</span></h3>
-            <canvas id="chart-scatter" style="max-height: 400px;"></canvas>
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>📅 Average Meals by Weekday</h3>
+                <canvas id="chart-weekday"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🌤️ Weather Impact on Demand</h3>
+                <canvas id="chart-weather"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>🎉 Festival vs Non-Festival</h3>
+                <canvas id="chart-festival"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>👥 Customers vs Meals Consumed</h3>
+                <canvas id="chart-scatter"></canvas>
+            </div>
+            <div class="chart-card chart-wide">
+                <h3>🏆 Model Performance Comparison</h3>
+                <canvas id="chart-models"></canvas>
+            </div>
         </div>
-        <div class="card animate-up delay-1">
-            <h3 style="margin-bottom: 2rem; font-size: 1.2rem;">📈 Accuracy Matrix <span
-                    style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem; margin-left: 10px;">Model
-                    Comparison</span></h3>
-            <canvas id="chart-models" style="max-height: 400px;"></canvas>
-        </div>
-    </div>
+    </section>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <div class="card animate-up delay-2">
-            <h3 style="margin-bottom: 2rem; font-size: 1.2rem;">📅 Temporal Density <span
-                    style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem; margin-left: 10px;">Weekly
-                    Consumption Cycles</span></h3>
-            <canvas id="chart-weekday" style="max-height: 350px;"></canvas>
-        </div>
-        <div class="card animate-up delay-2">
-            <h3 style="margin-bottom: 2rem; font-size: 1.2rem;">🌤️ Environmental Drift <span
-                    style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem; margin-left: 10px;">Weather
-                    Impact Visualization</span></h3>
-            <canvas id="chart-weather" style="max-height: 350px;"></canvas>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    <footer class="footer">
+        <p>Smart Food Waste Prediction System &copy; 2026</p>
+    </footer>
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='charts.js') }}"></script>
-<script>
-    async function fetchROI() {
-        try {
-            const res = await fetch('/api/roi-summary');
-            const data = await res.json();
-            document.getElementById('roi-money').textContent = '₹' + data.total_money_saved.toLocaleString();
-            document.getElementById('roi-co2').textContent = data.total_co2_saved.toFixed(1);
-            document.getElementById('roi-meals').textContent = data.total_meals_saved.toLocaleString();
-        } catch (e) {
-            console.error('Error fetching ROI:', e);
-        }
-    }
+    <script src="{{ url_for('static', filename='charts.js') }}"></script>
+</body>
 
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchROI();
-        // Delay chart loading to allow for animation smooth start
-        setTimeout(loadCharts, 300);
-    });
-</script>
-{% endblock %}
+</html>

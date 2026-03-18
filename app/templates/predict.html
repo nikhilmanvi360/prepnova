@@ -1,185 +1,154 @@
-{% extends "layout.html" %}
-{% block title %}Predict | PrepNova Intelligence{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<div class="animate-up">
-    <div style="text-align: center; margin-bottom: 6rem;">
-        <div
-            style="display: inline-block; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">
-            Demand Intelligence Engine
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Meals — FoodWasteAI</title>
+    <meta name="description" content="Enter daily operational parameters to predict meal demand">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-icon">🍽️</span>
+            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
         </div>
-        <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.04em;">Preparation Forecast</h1>
-        <p style="color: var(--text-second); max-width: 550px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">
-            Synchronize your operational volume with machine learning projections.</p>
-    </div>
-
-    {% if detected_holiday %}
-    <div class="card"
-        style="background: linear-gradient(135deg, var(--bg-surface), var(--bg-muted)); border: 1px solid var(--primary-glow); margin-bottom: 4rem; display: flex; align-items: center; gap: 2rem; padding: 2rem 3rem;">
-        <div
-            style="width: 60px; height: 60px; background: var(--primary-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
-            🌱</div>
-        <div>
-            <div style="font-weight: 800; color: var(--primary); font-size: 1.1rem; margin-bottom: 4px;">Operational
-                Context: {{ detected_holiday }}</div>
-            <div style="font-size: 0.95rem; color: var(--text-second);">System has automatically recalibrated feature
-                weights for this event.</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/predict" class="nav-link active">Predict</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
         </div>
-        <input type="hidden" name="event_name" value="{{ detected_holiday }}">
-    </div>
-    {% endif %}
+    </nav>
 
-    <div class="form-card">
-        <form method="POST" action="/predict" id="predict-form">
-            <div class="form-grid">
-                <!-- Column 1: Context -->
-                <div>
-                    <h3 class="form-section-title">Contextual Signals</h3>
+    <section class="form-section">
+        <div class="form-container">
+            <div class="form-header">
+                <div class="form-badge">🎯 Meal Demand Predictor</div>
+                <h1>Enter Daily Information</h1>
+                <p>Fill in the operational parameters below to get an AI-powered meal demand prediction.</p>
+            </div>
 
+            {% if error %}
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/predict" id="predict-form">
+                <div class="form-grid">
                     <div class="form-group">
-                        <label for="date-picker">Operational Date</label>
-                        <input type="date" id="date-picker" required>
-                        <input type="hidden" name="day" id="day">
+                        <label for="day">
+                            <span class="label-icon">📅</span> Day of Week
+                        </label>
+                        <select name="day" id="day" required>
+                            <option value="" disabled selected>Select day...</option>
+                            {% for d in days %}
+                            <option value="{{ d }}">{{ d }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="weather">Environmental Vectors</label>
-                        <div style="display: flex; gap: 1rem;">
-                            <select name="weather" id="weather" required>
-                                <option value="" disabled selected>Select condition...</option>
-                                {% for w in weathers %}
-                                <option value="{{ w }}">{{ w }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="btn btn-secondary" id="btn-fetch-weather"
-                                style="padding: 16px; min-width: 60px;">🌐</button>
+                        <label for="weather">
+                            <span class="label-icon">🌤️</span> Weather
+                        </label>
+                        <select name="weather" id="weather" required>
+                            <option value="" disabled selected>Select weather...</option>
+                            {% for w in weathers %}
+                            <option value="{{ w }}">{{ w }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <span class="label-icon">🎉</span> Festival Day
+                        </label>
+                        <div class="toggle-group">
+                            <label class="toggle-option">
+                                <input type="radio" name="festival" value="0" checked>
+                                <span class="toggle-label">No</span>
+                            </label>
+                            <label class="toggle-option">
+                                <input type="radio" name="festival" value="1">
+                                <span class="toggle-label">Yes</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Operational Model</label>
-                        <div style="display: flex; gap: 10px;">
-                            <label style="flex: 1;">
-                                <input type="radio" name="festival" value="0" {{ 'checked' if not detected_holiday
-                                    else '' }} style="display: none;">
-                                <div class="toggle-box"
-                                    style="padding: 16px; border: 1px solid var(--border-soft); border-radius: var(--radius-md); text-align: center; cursor: pointer; font-weight: 700; transition: var(--transition-fast);">
-                                    Standard</div>
-                            </label>
-                            <label style="flex: 1;">
-                                <input type="radio" name="festival" value="1" {{ 'checked' if detected_holiday else ''
-                                    }} style="display: none;">
-                                <div class="toggle-box"
-                                    style="padding: 16px; border: 1px solid var(--border-soft); border-radius: var(--radius-md); text-align: center; cursor: pointer; font-weight: 700; transition: var(--transition-fast);">
-                                    Event Mode</div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 2: Data -->
-                <div>
-                    <h3 class="form-section-title">Performance Metrics</h3>
-
-                    <div class="form-group">
-                        <label for="expected_customers">Anticipated Foot Traffic</label>
+                        <label for="expected_customers">
+                            <span class="label-icon">👥</span> Expected Customers
+                        </label>
                         <input type="number" name="expected_customers" id="expected_customers" min="50" max="1000"
                             placeholder="e.g. 400" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="prev_day">Previous Cycle Volume</label>
+                        <label for="prev_day">
+                            <span class="label-icon">⏮️</span> Previous Day Consumption
+                        </label>
                         <input type="number" name="prev_day" id="prev_day" min="0" max="1000" placeholder="e.g. 350"
                             required>
                     </div>
 
                     <div class="form-group">
-                        <label for="prev_week">Historical Benchmark (W-1)</label>
+                        <label for="prev_week">
+                            <span class="label-icon">📆</span> Previous Week Same Day
+                        </label>
                         <input type="number" name="prev_week" id="prev_week" min="0" max="1000" placeholder="e.g. 370"
                             required>
                     </div>
                 </div>
-            </div>
 
-            <!-- Risk Mitigation Slider -->
-            <div
-                style="margin-top: 4rem; padding: 3rem; background: var(--bg-muted); border-radius: var(--radius-lg); border: 2px dashed var(--border-deep);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
-                    <div>
-                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Surgical Safety Buffer</h3>
-                        <p style="color: var(--text-second); font-size: 0.9rem;">Calibrate production overhead to
-                            mitigate environmental variance.</p>
-                    </div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: var(--primary);"><span
-                            id="buffer-value">10</span><span style="font-size: 1.25rem; opacity: 0.6;">%</span></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg" id="btn-predict">
+                        <span class="btn-icon">🔮</span> Predict Meals
+                    </button>
                 </div>
-                <input type="range" name="safety_buffer" id="safety_buffer" min="0" max="25" value="10" step="5"
-                    style="width: 100%; accent-color: var(--primary); cursor: pointer;">
+            </form>
+
+            <div class="smart-tip" id="smart-tip" style="display:none;">
+                <span class="tip-icon">💡</span>
+                <span class="tip-text" id="tip-text"></span>
             </div>
+        </div>
+    </section>
 
-            <div style="text-align: center; margin-top: 5rem;">
-                <button type="submit" class="btn btn-primary" id="btn-submit"
-                    style="padding: 20px 80px; font-size: 1.1rem; box-shadow: 0 20px 40px var(--primary-glow);">Execute
-                    Neural Projection</button>
-            </div>
-        </form>
-    </div>
-</div>
+    <footer class="footer">
+        <p>Smart Food Waste Prediction System &copy; 2026</p>
+    </footer>
 
-<style>
-    input[type="radio"]:checked+.toggle-box {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-        box-shadow: 0 8px 16px var(--primary-glow);
-    }
+    <script>
+        // Dynamic smart tips based on input
+        const tips = {
+            'Rainy': 'Rainy weather usually reduces dining demand by ~25%.',
+            'Stormy': 'Stormy conditions can cut demand by up to 40%.',
+            'Friday': 'Demand is usually higher on Fridays.',
+            'Saturday': 'Weekend days often show different consumption patterns.',
+            'Sunday': 'Sunday dining patterns can be unpredictable.',
+        };
 
-    .toggle-box:hover {
-        background: var(--bg-muted);
-    }
-</style>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    const datePicker = document.getElementById('date-picker');
-    const dayInput = document.getElementById('day');
-
-    const today = new Date();
-    datePicker.value = today.toISOString().split('T')[0];
-
-    function updateDayOfWeek() {
-        const date = new Date(datePicker.value);
-        if (isNaN(date)) return;
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        dayInput.value = days[date.getUTCDay()];
-    }
-
-    updateDayOfWeek();
-    datePicker.addEventListener('change', updateDayOfWeek);
-
-    const bufferSlider = document.getElementById('safety_buffer');
-    const bufferValue = document.getElementById('buffer-value');
-    bufferSlider.addEventListener('input', function () {
-        bufferValue.textContent = this.value;
-    });
-
-    document.getElementById('predict-form').addEventListener('submit', function () {
-        const btn = document.getElementById('btn-submit');
-        btn.innerHTML = '<span style="animation: spin 1s linear infinite; display: inline-block; margin-right: 10px;">✨</span> Processing Matrix...';
-        btn.disabled = true;
-    });
-</script>
-
-<style>
-    @keyframes spin {
-        from {
-            transform: rotate(0deg);
+        function showTip(text) {
+            const el = document.getElementById('smart-tip');
+            document.getElementById('tip-text').textContent = text;
+            el.style.display = 'flex';
+            el.classList.add('tip-animate');
         }
 
-        to {
-            transform: rotate(360deg);
-        }
-    }
-</style>
-{% endblock %}
+        document.getElementById('weather').addEventListener('change', function () {
+            if (tips[this.value]) showTip(tips[this.value]);
+        });
+        document.getElementById('day').addEventListener('change', function () {
+            if (tips[this.value]) showTip(tips[this.value]);
+        });
+    </script>
+</body>
+
+</html>
