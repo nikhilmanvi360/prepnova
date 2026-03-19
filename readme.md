@@ -52,11 +52,17 @@ PrepNova functions as a continuous intelligence loop:
 
 ## 📸 Screenshots / Demo
 
-> [!TIP]
-> **Recommended Visuals to Include:**
-> 1. **The Intelligence Engine:** A screenshot of the `/predict` form showing environmental parameters.
-> 2. **The Data Ledger:** A shot of the `/history` dashboard with verified status badges.
-> 3. **The Analytics BI:** View of the scatter plots showing customer-to-meal correlation.
+### 🏗️ Intelligence Home Page
+![Home Hero](docs/images/home_hero.png)
+
+### ⚙️ The Forecast Engine (Predict)
+![Engine View](docs/images/engine_form.png)
+
+### 📊 BI Analytics Dashboard
+![Analytics View](docs/images/analytics_dashboard.png)
+
+### 📓 Operational History Ledger
+![History View](docs/images/history_ledger.png)
 
 ---
 
