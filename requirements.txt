@@ -12,3 +12,4 @@ requests
 holidays
 gunicorn
 flask-cors
+python-dotenv

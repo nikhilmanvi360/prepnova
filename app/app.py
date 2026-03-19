@@ -18,6 +18,10 @@ from catboost import CatBoostRegressor
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
 
 # == App Setup =========================================================
 app = Flask(__name__)
