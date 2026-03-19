@@ -1,101 +1,134 @@
-# 🍽️ PrepNova — Smart Food Waste Prediction System
+# 🍽️ PrepNova
 
-An AI-powered meal demand forecasting tool that helps food service operations minimize waste and optimize preparation volumes using ensemble machine learning models.
+### Eliminate Operational Drift with Predictive Yield Intelligence.
 
-## 📁 Project Structure
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat-community&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=flat-community&logo=flask&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-community&logo=react&logoColor=black)
+![ML](https://img.shields.io/badge/Ensemble-ML-2D6A4F?style=flat-community)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-community)
 
-```
-prepnova/
-├── app/                        # Flask Application
-│   ├── app.py                  # Main server — routes, ML inference, APIs
-│   ├── static/
-│   │   ├── style.css           # Global stylesheet
-│   │   └── charts.js           # Chart.js visualizations for Analytics & History
-│   └── templates/
-│       ├── layout.html         # Base template (navbar, footer, CDN imports)
-│       ├── index.html          # Landing / Home page
-│       ├── predict.html        # Prediction form (environmental parameters)
-│       ├── result.html         # Forecast results & behavioral insights
-│       ├── analytics.html      # Analytics dashboard with interactive charts
-│       └── history.html        # Prediction data ledger & verification
-│
-├── data/                       # Dataset
-│   ├── dataset.csv             # Training data (1000 rows)
-│   └── generate_dataset.py     # Script to regenerate synthetic data
-│
-├── models/                     # Trained ML Artifacts
-│   ├── model.pkl               # Stacking ensemble (XGBoost, LightGBM, CatBoost, etc.)
-│   ├── encoders.pkl            # Label encoders for categorical features
-│   ├── analytics_data.pkl      # Pre-computed analytics (day/weather means, scatter data)
-│   └── diagnostics.png         # Model performance visualization
-│
-├── notebooks/                  # ML Development
-│   ├── train_model.py          # Full training pipeline (6 models + stacking)
-│   └── diagnose_model.py       # Model evaluation & diagnostic plots
-│
-├── frontend/                   # (Optional) Vite + React frontend
-│   └── ...
-│
-├── requirements.txt            # Python dependencies
-├── run_app.sh                  # One-command startup script
-└── readme.md                   # This file
-```
+---
 
-## 🚀 Quick Start
+## 🚀 Overview
+PrepNova is an elite operational forecasting engine designed for high-volume food service environments. It bridges the gap between environmental variables and kitchen production, using advanced machine learning to solve the **$1 Trillion food waste problem.**
 
-### 1. Install Dependencies
+**The Problem:** Overproduction caused by guessing demand leads to massive financial loss and environmental decay.
+**The Solution:** A precision intelligence layer that aggregates weather vectors, holiday signals, and historical flow to generate bulletproof production targets.
+
+---
+
+## ✨ Features
+- 🌲 **Predictive Yield Intelligence** — Forecast exact meal volumes with algorithmic precision.
+- ⚡ **Ensemble Forecasting** — Orchestrates 6 ML models (XGBoost, CatBoost, etc.) for zero-drift accuracy.
+- 📊 **Operational Analytics** — Interactive visualization of weekday trends, weather impact, and festival variance.
+- 📓 **Verified Ledger** — A data-storing dashboard to track predictions against actual consumption.
+- 🌦️ **Environmental Vectoring** — Automatically adjusts logic based on real-time weather and holiday data.
+- 🎨 **Farm UI Aesthetic** — A premium, high-density dashboard designed for rapid operational scanning.
+
+---
+
+## 🧠 How It Works
+PrepNova functions as a continuous intelligence loop:
+
+1.  **Ingestion:** Collects operational inputs (footfall, weather, day category).
+2.  **Processing:** Feeds data into a **Stacking Ensemble Meta-Learner** combining 5 specialized models.
+3.  **Refinement:** Applies safety buffers and anomaly detection logic to the raw AI output.
+4.  **Action:** Delivers a final recommendation and logs it to the **Operational Ledger** for post-event verification.
+
+---
+
+## 🛠 Tech Stack
+
+| Category | Tech |
+|----------|------|
+| **Backend** | Flask (Python), SQLite, Jinja2 |
+| **Frontend** | React 19, Vite, Tailwind CSS 4, Motion One |
+| **Intelligence** | Scikit-learn, XGBoost, LightGBM, CatBoost |
+| **Visualization** | Chart.js, Lucide Icons |
+| **DevOps** | Shell Scripting, Git |
+
+---
+
+## 📸 Screenshots / Demo
+
+> [!TIP]
+> **Recommended Visuals to Include:**
+> 1. **The Intelligence Engine:** A screenshot of the `/predict` form showing environmental parameters.
+> 2. **The Data Ledger:** A shot of the `/history` dashboard with verified status badges.
+> 3. **The Analytics BI:** View of the scatter plots showing customer-to-meal correlation.
+
+---
+
+## ⚙️ Installation
+
+### 1. Set Up Environment
 ```bash
+git clone https://github.com/nikhilmanvi360/prepnova.git
+cd prepnova
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Application
+### 2. Launch Backend & Core UI
 ```bash
 chmod +x run_app.sh
 ./run_app.sh
 ```
-The app will be available at **http://localhost:5000**
 
-## 🧠 How It Works
-
-1. **Input Parameters** — Day, weather, expected footfall, festival status, and historical consumption
-2. **ML Ensemble** — 6 models (Random Forest, Gradient Boosting, XGBoost, LightGBM, CatBoost, Stacking) generate predictions
-3. **Smart Recommendation** — Applies safety buffers and anomaly detection
-4. **Analytics** — Weekday trends, weather impact, festival variance, and model performance comparison
-5. **History Dashboard** — Tracks all predictions with actual-consumed verification
-
-## 📊 ML Models
-
-| Model | Description |
-|-------|-------------|
-| Random Forest | Bagged decision trees |
-| Gradient Boosting | Sequential boosting |
-| XGBoost | Optimized gradient boosting |
-| LightGBM | Leaf-wise gradient boosting |
-| CatBoost | Category-aware boosting |
-| **Stacking Ensemble** | **Meta-learner combining all 5 models** |
-
-## 🔌 API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/predict` | GET/POST | Prediction form & submission |
-| `/result` | GET | Forecast results page |
-| `/analytics` | GET | Analytics dashboard |
-| `/history` | GET | Prediction history ledger |
-| `/api/analytics-summary` | GET | Chart data (weekday, weather, festival, scatter, models) |
-| `/api/dashboard-data` | GET | Time-series data for history chart |
-| `/api/roi-summary` | GET | Waste savings calculations |
-| `/update-actual` | POST | Submit actual consumed values |
-
-## 🛠️ Tech Stack
-
-- **Backend:** Flask, SQLite
-- **ML:** scikit-learn, XGBoost, LightGBM, CatBoost
-- **Frontend:** Jinja2 templates, Tailwind CSS, Chart.js, Motion One
-- **Fonts:** Inter, Instrument Serif
+### 3. Launch React Frontend (Optional)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
-*PrepNova Intelligence Systems © 2026*
+## 📂 Project Structure
+```text
+prepnova/
+├── app/                # Core Flask server, routes, and Jinja templates
+├── frontend/           # Modern React/Vite UI components
+├── models/             # Serialized ML Stacking Ensembles (.pkl)
+├── data/               # Training datasets and generation scripts
+├── notebooks/          # ML research, training docs, and diagnostics
+└── run_app.sh          # One-touch operational startup
+```
+
+---
+
+## 🎯 Use Cases
+- **Corporate Cafeterias:** Optimize lunch prep based on remote-work patterns and weather.
+- **University Dining:** Scale production for semester-start surges and festival weeks.
+- **Hospitality Hubs:** Synchronize supply chains with local event calendars.
+
+---
+
+## 🧪 Future Improvements
+- [ ] **IoT Sensor Integration** — Real-time bin weight logging for automated verification.
+- [ ] **Dynamic Retraining** — Automatic model weight adjustments based on ledger drift.
+- [ ] **Inventory API** — Direct connection to supply chain providers for automated ordering.
+
+---
+
+## 🤝 Contributing
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📜 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 💡 Author
+**Nikhil Manvi**
+[GitHub Profile](https://github.com/nikhilmanvi360)
+
+*Eliminating waste, one prediction at a time.*
