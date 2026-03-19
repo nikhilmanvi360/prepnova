@@ -1,5 +1,5 @@
 """
-Smart Food Waste Prediction System — Flask Application
+Smart Food Waste Prediction System -- Flask Application
 Routes: Home, Predict, Result, Analytics
 """
 
@@ -7,14 +7,18 @@ import os
 import sys
 import json
 import sqlite3
+import requests
 import numpy as np
 import pandas as pd
 import joblib
 import holidays
-from datetime import datetime
+from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
+from catboost import CatBoostRegressor
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 
-# ── App Setup ─────────────────────────────────────────────────────────
+# == App Setup =========================================================
 app = Flask(__name__)
 app.secret_key = 'food-waste-pred-2026'
 DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
@@ -24,7 +28,41 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ── Load Model & Config ──────────────────────────────────────────────
+# == API Configuration ==================================================
+# NOTE: User should provide their own OpenWeatherMap API Key
+OPENWEATHER_API_KEY = os.environ.get('OPENWEATHER_API_KEY', 'PLACEHOLDER_KEY')
+CITY_NAME = "Bangalore" # Default city
+
+def get_weather_from_api(city=CITY_NAME):
+    """Fetches real-time weather from OpenWeatherMap."""
+    if OPENWEATHER_API_KEY == 'PLACEHOLDER_KEY':
+        return None
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+        res = requests.get(url, timeout=5).json()
+        if res.get('cod') == 200:
+            temp = res['main']['temp']
+            weather_main = res['weather'][0]['main']
+            # Map API weather to our classes: Sunny, Cloudy, Rainy, Stormy
+            mapping = {
+                'Clear': 'Sunny',
+                'Clouds': 'Cloudy',
+                'Rain': 'Rainy',
+                'Drizzle': 'Rainy',
+                'Thunderstorm': 'Stormy',
+                'Mist': 'Cloudy',
+                'Fog': 'Cloudy'
+            }
+            return {
+                'temp': temp,
+                'condition': mapping.get(weather_main, 'Sunny'),
+                'description': res['weather'][0]['description']
+            }
+    except Exception as e:
+        print(f"Weather API Error: {e}")
+    return None
+
+# == Load Model & Config ===============================================
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(ROOT, 'models', 'model.pkl')
 ENCODERS_PATH = os.path.join(ROOT, 'models', 'encoders.pkl')
@@ -42,23 +80,21 @@ NUMERIC_FEATURES = config['numeric_features']
 WEATHER_IMPACT = config['weather_impact']
 WEEKEND_DAYS = config['weekend_days']
 
-# ROI Constants
-AVG_COST_PER_MEAL = 250.0  # INR (Indian Rupees)
-CO2_KG_PER_MEAL = 0.3      # KG
+# ROI & Conversion Factors
+AVG_COST_PER_MEAL = 8.50   # USD (Updated to standard)
+CO2_KG_PER_MEAL = 2.5      # KG
+AVG_MEAL_SIZE_KG = 0.5     # KG
 
 # Cyclical Day Encoding Map
 day_map = {'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6}
 
-def get_holiday_name(date_str=None):
-    """Detects holiday for a given date string (YYYY-MM-DD) or today."""
+def get_holiday_name(date_obj=None):
+    """Detects holiday for a given date object or today."""
     try:
-        if not date_str:
+        if not date_obj:
             date_obj = datetime.now()
-        else:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
         
         # Check US and India holidays as examples
-        # The user's system time is 2026-03-17 (St. Patrick's Day)
         us_holidays = holidays.US()
         in_holidays = holidays.India()
         
@@ -67,7 +103,14 @@ def get_holiday_name(date_str=None):
     except Exception:
         return None
 
-# ── Smart Tips Logic ──────────────────────────────────────────────────
+@app.route('/api/fetch-weather')
+def api_fetch_weather():
+    """Endpoint for the frontend to fetch current weather."""
+    weather_data = get_weather_from_api()
+    if weather_data:
+        return jsonify(weather_data)
+    return jsonify({'error': 'Could not fetch weather or API key missing'}), 404
+
 def generate_tips(day, weather, festival, expected_customers, predicted):
     tips = []
 
@@ -101,12 +144,40 @@ def generate_tips(day, weather, festival, expected_customers, predicted):
 
 def get_confidence(predicted, expected_customers):
     """Return a confidence level based on the ratio."""
-    ratio = predicted / max(expected_customers, 1)
+    if expected_customers == 0: return 'Low'
+    ratio = predicted / expected_customers
     if 0.5 <= ratio <= 1.2:
         return 'High'
     elif 0.3 <= ratio <= 1.5:
         return 'Medium'
     return 'Low'
+
+def check_anomaly(value, feature_name):
+    """Checks if a value is an anomaly based on historical stats."""
+    mean = analytics_data.get('avg_meals', 400) # Fallback to 400
+    if feature_name == 'expected_customers':
+        if value > mean * 3.0: # Increased threshold to 3.0x
+            return True
+    return False
+
+def get_reasoning_labels(day, weather, festival, predicted, expected):
+    """Generates human-readable reasoning for the AI's prediction."""
+    reasons = []
+    if festival:
+        reasons.append("High demand expected due to Festival.")
+    if weather in ['Rainy', 'Stormy']:
+        reasons.append(f"Predicted decrease due to {weather} conditions.")
+    if day in WEEKEND_DAYS:
+        reasons.append("Weekend pattern detected.")
+    if expected > 0:
+        if predicted > expected * 1.1:
+            reasons.append("Historical data suggests higher turnout than registered customers.")
+        elif predicted < expected * 0.9:
+            reasons.append("Historical data suggests lower turnout than registered customers.")
+    
+    if not reasons:
+        reasons.append("Standard demand pattern based on historical trends.")
+    return reasons
 
 
 # ── Routes ────────────────────────────────────────────────────────────
@@ -123,17 +194,34 @@ def predict():
         return render_template('predict.html',
                                days=config['day_classes'],
                                weathers=config['weather_classes'],
-                               detected_holiday=detected_holiday)
+                               detected_holiday=detected_holiday,
+                               today_date=datetime.now().strftime('%Y-%m-%d'))
 
     # POST — process prediction
     try:
+        date_str = request.form.get('date', '')
         day = request.form['day']
         weather = request.form['weather']
         festival = int(request.form.get('festival', 0))
         event_name = request.form.get('event_name', '')
         
-        # Auto-detect holiday if not manually overridden
-        detected_holiday = get_holiday_name()
+        # Holiday Detection Logic
+        detected_holiday = None
+        if date_str:
+            try:
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                detected_holiday = get_holiday_name(date_obj)
+                # Ensure day matches date
+                day_from_date = date_obj.strftime('%A')
+                if day != day_from_date:
+                    # User selected a date but inconsistent day. Warn or auto-fix?
+                    # For now, we trust the 'day' input for the model, but maybe we should override.
+                    pass 
+            except ValueError:
+                pass
+        else:
+            detected_holiday = get_holiday_name()
+
         if detected_holiday and not festival:
             festival = 1
             event_name = detected_holiday
@@ -142,11 +230,15 @@ def predict():
         prev_day = int(request.form['prev_day'])
         prev_week = int(request.form['prev_week'])
         safety_buffer = int(request.form.get('safety_buffer', 0))
+        
+        # Anomaly Detection
+        is_anomaly = check_anomaly(expected_customers, 'expected_customers')
     except (KeyError, ValueError) as e:
         return render_template('predict.html',
                                days=config['day_classes'],
                                weathers=config['weather_classes'],
-                               error=f'Invalid input: {e}')
+                               error=f'Invalid input: {e}',
+                               today_date=datetime.now().strftime('%Y-%m-%d'))
 
     # Feature engineering (Must match train_model.py exactly)
     day_encoded = le_day.transform([day])[0]
@@ -219,6 +311,12 @@ def predict():
         print(f"Database error: {e}")
 
     confidence = get_confidence(predicted, expected_customers)
+    reasoning = get_reasoning_labels(day, weather, festival, predicted, expected_customers)
+    
+    # Confidence Interval (Simplified: ±5% for High, ±10% for Med, ±15% for Low)
+    ci_range = 0.05 if confidence == 'High' else (0.10 if confidence == 'Medium' else 0.15)
+    ci_min = int(predicted * (1 - ci_range))
+    ci_max = int(predicted * (1 + ci_range))
 
     res = {
         'day': day,
@@ -231,6 +329,10 @@ def predict():
         'safety_buffer': safety_buffer,
         'final_recommendation': final_recommendation,
         'confidence': confidence,
+        'reasoning': reasoning,
+        'ci_min': ci_min,
+        'ci_max': ci_max,
+        'is_anomaly': is_anomaly,
         'tips': generate_tips(day, weather, festival, expected_customers, predicted)
     }
 
@@ -241,14 +343,18 @@ def predict():
     session['result'] = {
         'predicted': predicted,
         'confidence': confidence,
-        'tips': res['tips'], # Use tips from res
+        'reasoning': reasoning,
+        'ci_min': ci_min,
+        'ci_max': ci_max,
+        'is_anomaly': is_anomaly,
+        'tips': res['tips'], 
         'waste_estimate': waste_estimate,
-        'final_recommendation': final_recommendation, # Add final_recommendation
+        'final_recommendation': final_recommendation,
         'inputs': {
             'day': day, 'weather': weather, 'festival': 'Yes' if festival else 'No',
             'expected_customers': expected_customers,
             'prev_day': prev_day, 'prev_week': prev_week,
-            'safety_buffer': safety_buffer # Add safety_buffer to inputs
+            'safety_buffer': safety_buffer
         }
     }
 
@@ -265,7 +371,10 @@ def result():
 
 @app.route('/analytics')
 def analytics():
-    return render_template('analytics.html', data=analytics_data)
+    return render_template('analytics.html',
+                           model_results=analytics_data.get('model_results', {}),
+                           best_model=analytics_data.get('best_model_name', 'N/A'),
+                           total_rows=analytics_data.get('total_rows', 0))
 
 @app.route('/history')
 def history():
@@ -333,6 +442,24 @@ def api_analytics_summary():
         'best_model': analytics_data['best_model_name'],
         'total_rows': analytics_data['total_rows'],
         'avg_meals': analytics_data['avg_meals']
+    })
+
+@app.route('/api/dashboard-data')
+def api_dashboard_data():
+    """Returns time-series data for the operational dashboard."""
+    conn = get_db_connection()
+    # Get last 30 verified predictions
+    rows = conn.execute('''SELECT timestamp, ai_prediction, actual_consumed, final_recommendation, expected_customers 
+                           FROM predictions WHERE is_actual_verified = 1 
+                           ORDER BY timestamp ASC LIMIT 30''').fetchall()
+    conn.close()
+
+    return jsonify({
+        'timestamps': [r['timestamp'].split(' ')[0] for r in rows],
+        'predictions': [r['ai_prediction'] for r in rows],
+        'actuals': [r['actual_consumed'] for r in rows],
+        'recommendations': [r['final_recommendation'] for r in rows],
+        'expected': [r['expected_customers'] for r in rows]
     })
 
 

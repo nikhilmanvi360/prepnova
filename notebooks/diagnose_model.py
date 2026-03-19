@@ -39,6 +39,20 @@ df['Expected_Weather_Impact'] = df['Expected_Customers'] * df['Weather_Impact_Sc
 df['Demand_Stability'] = abs(df['Previous_Day_Consumption'] - df['Previous_Week_Same_Day'])
 df['Avg_Historical_Consumption'] = (df['Previous_Day_Consumption'] + df['Previous_Week_Same_Day']) / 2
 
+# Advanced Ratios
+df['Consumption_Efficiency'] = df['Avg_Historical_Consumption'] / (df['Expected_Customers'] + 1)
+df['Lag_Trend'] = df['Previous_Day_Consumption'] / (df['Previous_Week_Same_Day'] + 1)
+
+# Cyclical Day Encoding
+day_map = {'Monday':0, 'Tuesday':1, 'Wednesday':2, 'Thursday':3, 'Friday':4, 'Saturday':5, 'Sunday':6}
+df['Day_Num'] = df['Day_of_Week'].map(day_map)
+df['Day_Sin'] = np.sin(2 * np.pi * df['Day_Num'] / 7)
+df['Day_Cos'] = np.cos(2 * np.pi * df['Day_Num'] / 7)
+
+# Polynomial & Log Features
+df['Expected_Squared'] = (df['Expected_Customers'] ** 2) / 1000
+df['Log_Expected'] = np.log1p(df['Expected_Customers'])
+
 X = df[FEATURES]
 X_scaled = X.copy()
 X_scaled[NUMERIC_FEATURES] = scaler.transform(X[NUMERIC_FEATURES])

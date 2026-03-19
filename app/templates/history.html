@@ -1,92 +1,252 @@
 {% extends "layout.html" %}
-{% block title %}Operational History | PrepNova Intelligence{% endblock %}
+
+{% block title %}Prediction Ledger — PrepNova Intelligence{% endblock %}
 
 {% block content %}
-<div class="animate-up">
-    <div style="text-align: center; margin-bottom: 6rem;">
-        <div
-            style="display: inline-block; padding: 8px 16px; background: var(--primary-glow); color: var(--primary); border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2rem;">
-            Operational Audit Log
-        </div>
-        <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.04em;">Forecast History</h1>
-        <p style="color: var(--text-second); max-width: 600px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6;">A
-            complete immutable record of system projections and verified consumption metrics.</p>
-    </div>
+<div class="relative w-full min-h-screen bg-stone-50/50 pb-20">
 
-    <div class="card"
-        style="padding: 0; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: var(--shadow-deep);">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead style="background: var(--bg-muted); border-bottom: 1px solid var(--border-soft);">
-                    <tr>
-                        <th
-                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
-                            Timestamp</th>
-                        <th
-                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
-                            Cycle</th>
-                        <th
-                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
-                            Vectors</th>
-                        <th
-                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
-                            Projection</th>
-                        <th
-                            style="padding: 1.5rem 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 800;">
-                            Verified Actual</th>
-                    </tr>
-                </thead>
-                <tbody style="background: white;">
-                    {% for row in predictions %}
-                    <tr style="border-bottom: 1px solid var(--bg-muted); transition: background 0.2s;"
-                        onmouseover="this.style.background='var(--bg-base)'" onmouseout="this.style.background='white'">
-                        <td
-                            style="padding: 1.5rem 2rem; font-size: 0.85rem; color: var(--text-muted); font-family: monospace;">
-                            {{ row['timestamp'] }}</td>
-                        <td style="padding: 1.5rem 2rem;">
-                            <div style="font-weight: 800; color: var(--text-main);">{{ row['day'] }}</div>
-                        </td>
-                        <td style="padding: 1.5rem 2rem;">
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <span
-                                    style="font-size: 0.7rem; padding: 4px 10px; background: var(--bg-muted); color: var(--text-second); border-radius: 4px; font-weight: 700;">{{
-                                    row['weather'] }}</span>
-                                {% if row['event_name'] %}
-                                <span
-                                    style="font-size: 0.7rem; padding: 4px 10px; background: #FFF9E6; color: #D97706; border-radius: 4px; font-weight: 700; border: 1px solid #FEF3C7;">{{
-                                    row['event_name'] }}</span>
-                                {% endif %}
-                            </div>
-                        </td>
-                        <td style="padding: 1.5rem 2rem;">
-                            <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">{{
-                                row['final_recommendation'] }}</div>
-                            <div
-                                style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
-                                Confidence Index 0.92</div>
-                        </td>
-                        <td style="padding: 1.5rem 2rem;">
-                            {% if row['is_actual_verified'] %}
-                            <div
-                                style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--primary-glow); color: var(--primary); border-radius: 6px; font-weight: 800;">
-                                <span style="font-size: 0.8rem;">✓</span> {{ row['actual_consumed'] }}
-                            </div>
-                            {% else %}
-                            <form action="{{ url_for('update_actual') }}" method="POST"
-                                style="display: flex; gap: 10px;">
-                                <input type="hidden" name="id" value="{{ row['id'] }}">
-                                <input type="number" name="actual_consumed" placeholder="Actual" required
-                                    style="padding: 8px 12px; font-size: 0.9rem; width: 80px; border-radius: var(--radius-sm); border: 1px solid var(--border-soft);">
-                                <button type="submit" class="btn btn-primary"
-                                    style="padding: 8px 16px; font-size: 0.8rem; border-radius: var(--radius-sm);">Verify</button>
-                            </form>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Compact Data Dashboard Header -->
+    <header class="bg-white border-b border-stone-200 px-6 py-6 sm:px-10 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-12 w-12 bg-[#e8f5e9] rounded-xl flex items-center justify-center text-[#2d6a4f] shrink-0 border border-[#b7e4c7]/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4" />
+                        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                        <path d="M3 15h6" />
+                        <path d="M3 18h6" />
+                        <path d="M3 21h6" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-serif text-stone-800 tracking-tight">Meal Prediction Data Storing Dashboard
+                    </h1>
+                    <p class="text-sm text-stone-500 mt-0.5">All previous predictions, parameters, and outcome
+                        verification.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-[#2d6a4f]">Total Records</span>
+                    <span class="inline-flex items-center gap-1.5 text-sm font-bold text-stone-700">
+                        {{ predictions|length }}
+                    </span>
+                </div>
+                <div class="h-10 w-px bg-stone-200 mx-2"></div>
+                <a href="/predict"
+                    class="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#1b4332] text-white text-sm font-semibold hover:bg-[#081c15] transition-colors shadow-sm gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14" />
+                        <path d="M5 12h14" />
+                    </svg>
+                    New Prediction
+                </a>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="max-w-[1600px] mx-auto px-6 sm:px-10 pt-8 space-y-6">
+
+        <!-- Yield Timeline Chart -->
+        <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 rounded-lg bg-stone-100 text-stone-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18" />
+                            <path d="m19 9-5 5-4-4-3 3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-stone-800">Yield Consistency Timeline</h2>
+                        <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Past 30 Verification
+                            Cycles</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-semibold text-stone-500">
+                    <span class="flex items-center gap-1.5">
+                        <div class="w-3 h-3 rounded-sm bg-[#2d6a4f]"></div> Target Yield
+                    </span>
+                </div>
+            </div>
+            <div class="relative w-full h-[280px]">
+                <canvas id="chart-history"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden flex flex-col">
+
+            <!-- Table Header Bar -->
+            <div class="bg-white px-6 py-4 border-b border-stone-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 rounded-lg bg-stone-100 text-stone-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2" />
+                            <path d="M21 12H3" />
+                            <path d="M12 3v18" />
+                        </svg>
+                    </div>
+                    <h2 class="text-base font-bold text-stone-800">Prediction Logs</h2>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead>
+                        <tr
+                            class="border-b border-stone-200 bg-stone-50/80 text-[10px] uppercase tracking-widest text-stone-500 font-bold">
+                            <th class="px-6 py-3.5">#</th>
+                            <th class="px-6 py-3.5">Timestamp</th>
+                            <th class="px-6 py-3.5">Day</th>
+                            <th class="px-6 py-3.5">Weather</th>
+                            <th class="px-6 py-3.5 text-right">Expected Customers</th>
+                            <th class="px-6 py-3.5 text-right">AI Prediction</th>
+                            <th class="px-6 py-3.5 text-right">Final Recommendation</th>
+                            <th class="px-6 py-3.5 text-right">Actual Consumed</th>
+                            <th class="px-6 py-3.5">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        {% if predictions %}
+                        {% for row in predictions %}
+                        <tr class="hover:bg-[#f6fff8] transition-colors group">
+                            <td class="px-6 py-3 text-xs text-stone-400 font-mono">{{ row['id'] }}</td>
+                            <td class="px-6 py-3 font-mono text-xs text-stone-500">{{ row['timestamp'] }}</td>
+                            <td class="px-6 py-3 font-semibold text-stone-700">{{ row['day'] }}</td>
+                            <td class="px-6 py-3">
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-stone-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-600 border border-transparent group-hover:bg-white group-hover:border-stone-200 transition-colors">
+                                    {% if row['weather'] == 'Sunny' %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                        fill="none" class="text-amber-500" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="4" />
+                                        <path d="M12 2v2" />
+                                        <path d="M12 20v2" />
+                                        <path d="m4.93 4.93 1.41 1.41" />
+                                        <path d="m17.66 17.66 1.41 1.41" />
+                                        <path d="M2 12h2" />
+                                        <path d="M20 12h2" />
+                                        <path d="m6.34 17.66-1.41 1.41" />
+                                        <path d="m19.07 4.93-1.41 1.41" />
+                                    </svg>
+                                    {% elif row['weather'] == 'Rainy' %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                        fill="none" class="text-blue-500" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9" />
+                                        <path d="M16 14v6" />
+                                        <path d="M8 14v6" />
+                                        <path d="M12 16v6" />
+                                    </svg>
+                                    {% elif row['weather'] == 'Stormy' %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                        fill="none" class="text-indigo-500" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9" />
+                                        <path d="m13 11-4 5h6l-4 5" />
+                                    </svg>
+                                    {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                        fill="none" class="text-stone-400" stroke="currentColor" stroke-width="2">
+                                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                                    </svg>
+                                    {% endif %}
+                                    {{ row['weather'] }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 font-mono text-xs text-right text-stone-500">{{
+                                row['expected_customers'] }}</td>
+                            <td class="px-6 py-3 font-mono text-xs text-right text-stone-600">{{ row['ai_prediction'] }}
+                            </td>
+                            <td class="px-6 py-3 font-bold text-right text-[#1b4332] text-base">{{
+                                row['final_recommendation'] }}</td>
+                            <td class="px-6 py-3 text-right">
+                                {% if row['is_actual_verified'] %}
+                                <span class="font-bold text-stone-800">{{ row['actual_consumed'] }}</span>
+                                {% else %}
+                                <!-- Inline form to submit actual consumed -->
+                                <form method="POST" action="/update-actual" class="inline-flex items-center gap-2">
+                                    <input type="hidden" name="id" value="{{ row['id'] }}">
+                                    <input type="number" name="actual_consumed" placeholder="Enter"
+                                        class="w-20 h-7 px-2 rounded-md border border-stone-200 bg-stone-50 text-xs text-stone-800 text-right focus:outline-none focus:ring-1 focus:ring-[#52b788] focus:border-[#52b788]">
+                                    <button type="submit"
+                                        class="h-7 px-2 rounded-md bg-[#1b4332] text-white text-[10px] font-bold hover:bg-[#081c15] transition-colors">
+                                        ✓
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-3">
+                                {% if row['is_actual_verified'] %}
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-[#e8f5e9] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1b4332]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#52b788]"></span>
+                                    Verified
+                                </span>
+                                {% else %}
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 border border-amber-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                    Pending
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="px-6 py-16 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div
+                                        class="h-14 w-14 rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm font-bold text-stone-500">No predictions yet</p>
+                                    <p class="text-xs text-stone-400 max-w-xs">Make your first prediction to start
+                                        populating the data ledger.</p>
+                                    <a href="/predict"
+                                        class="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1b4332] text-white text-sm font-semibold hover:bg-[#081c15] transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 5v14" />
+                                            <path d="M5 12h14" />
+                                        </svg>
+                                        Make a Prediction
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer -->
+            {% if predictions %}
+            <div class="bg-stone-50/50 px-6 py-3 border-t border-stone-200 flex items-center justify-between">
+                <span class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Showing {{
+                    predictions|length }} Records</span>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
 {% endblock %}

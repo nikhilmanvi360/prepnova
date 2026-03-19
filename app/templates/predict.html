@@ -1,146 +1,426 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
+{% block title %}Engine Toolkit — PrepNova Intelligence{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predict Meals — FoodWasteAI</title>
-    <meta name="description" content="Enter daily operational parameters to predict meal demand">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block content %}
+<div class="relative w-full min-h-screen bg-stone-50 pb-32">
 
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <span class="nav-icon">🍽️</span>
-            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
+    <!-- Hero Header - Nature Theme (Gradient of lush greens) -->
+    <header
+        class="bg-gradient-to-br from-[#1b4332] via-[#2d6a4f] to-[#081c15] pt-24 pb-28 px-6 sm:px-12 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
+        <!-- Subtle Pattern overlay -->
+        <div class="absolute inset-0 opacity-[0.03]"
+            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
         </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/predict" class="nav-link active">Predict</a>
-            <a href="/analytics" class="nav-link">Analytics</a>
+
+        <div class="max-w-4xl mx-auto relative z-10 text-center animate-fade-in-up">
+            <span
+                class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#d8f3dc] mb-6 backdrop-blur-sm border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 12" />
+                </svg>
+                Forecast Generation
+            </span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6">
+                Intelligence Engine
+            </h1>
+            <p class="text-[#b7e4c7] text-lg max-w-2xl mx-auto leading-relaxed">
+                Configure environmental parameters and historical consumption data to generate a high-confidence
+                probabilistic meal demand forecast.
+            </p>
         </div>
-    </nav>
+    </header>
 
-    <section class="form-section">
-        <div class="form-container">
-            <div class="form-header">
-                <div class="form-badge">🎯 Meal Demand Predictor</div>
-                <h1>Enter Daily Information</h1>
-                <p>Fill in the operational parameters below to get an AI-powered meal demand prediction.</p>
+    <!-- Main Workspace -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 -mt-16 relative z-20">
+
+        {% if error %}
+        <div
+            class="mb-8 rounded-2xl bg-red-50 p-4 border border-red-200 flex items-start gap-4 shadow-sm animate-fade-in">
+            <div class="text-red-600 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" x2="12" y1="8" y2="12" />
+                    <line x1="12" x2="12.01" y1="16" y2="16" />
+                </svg>
             </div>
-
-            {% if error %}
-            <div class="alert alert-error">
-                <span class="alert-icon">⚠️</span>
-                {{ error }}
+            <div>
+                <h4 class="text-sm font-bold text-red-900 tracking-wide">Parameter Error</h4>
+                <p class="text-sm text-red-800 mt-1">{{ error }}</p>
             </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-            <form method="POST" action="/predict" id="predict-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="day">
-                            <span class="label-icon">📅</span> Day of Week
-                        </label>
-                        <select name="day" id="day" required>
-                            <option value="" disabled selected>Select day...</option>
-                            {% for d in days %}
-                            <option value="{{ d }}">{{ d }}</option>
-                            {% endfor %}
-                        </select>
+        <form method="POST" action="/predict" id="predict-form"
+            class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-200 p-6 sm:p-10 md:p-12 space-y-12">
+
+            <!-- SECTION 1: Environment -->
+            <div class="space-y-8">
+                <!-- Section Title -->
+                <div class="flex items-center gap-4 border-b border-stone-100 pb-4">
+                    <div
+                        class="h-12 w-12 bg-[#e8f5e9] text-[#2d6a4f] rounded-2xl flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-stone-800">1. Atmospheric & Temporal Data</h2>
+                        <p class="text-sm text-stone-500">Define the target operational window.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- Date -->
+                    <div class="space-y-2 relative group">
+                        <label for="date" class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">Target
+                            Date</label>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#2d6a4f] transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                                    <line x1="16" x2="16" y1="2" y2="6" />
+                                    <line x1="8" x2="8" y1="2" y2="6" />
+                                    <line x1="3" x2="21" y1="10" y2="10" />
+                                </svg>
+                            </div>
+                            <input type="date" name="date" id="date" value="{{ today_date }}" required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-12 pr-4 text-stone-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#52b788] focus:border-[#52b788] hover:border-stone-300">
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="weather">
-                            <span class="label-icon">🌤️</span> Weather
-                        </label>
-                        <select name="weather" id="weather" required>
-                            <option value="" disabled selected>Select weather...</option>
-                            {% for w in weathers %}
-                            <option value="{{ w }}">{{ w }}</option>
-                            {% endfor %}
-                        </select>
+                    <!-- Day -->
+                    <div class="space-y-2 relative group">
+                        <label for="day" class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">Day of
+                            Week</label>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#2d6a4f] transition-colors pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                            <select name="day" id="day" required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-12 pr-4 text-stone-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#52b788] focus:border-[#52b788] hover:border-stone-300 appearance-none cursor-pointer">
+                                <option value="" disabled selected>Select day...</option>
+                                {% for d in days %}
+                                <option value="{{ d }}">{{ d }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute right-4 text-stone-400 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>
-                            <span class="label-icon">🎉</span> Festival Day
-                        </label>
-                        <div class="toggle-group">
-                            <label class="toggle-option">
-                                <input type="radio" name="festival" value="0" checked>
-                                <span class="toggle-label">No</span>
+                    <!-- Weather -->
+                    <div class="space-y-2 relative group md:col-span-2">
+                        <div class="flex items-center justify-between ml-1 mb-1">
+                            <label for="weather"
+                                class="text-xs font-bold uppercase tracking-wider text-stone-500">Weather
+                                Condition</label>
+                            <button type="button" id="btn-fetch-weather"
+                                class="text-[10px] font-bold uppercase tracking-widest text-[#2d6a4f] flex items-center gap-1 hover:text-[#1b4332] transition-colors bg-[#e8f5e9] px-2 py-1 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                                    <path d="M16 21v-5h5" />
+                                </svg>
+                                Auto-Fetch
+                            </button>
+                        </div>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#2d6a4f] transition-colors pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                                </svg>
+                            </div>
+                            <select name="weather" id="weather" required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-12 pr-4 text-stone-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#52b788] focus:border-[#52b788] hover:border-stone-300 appearance-none cursor-pointer">
+                                <option value="" disabled selected>Identify weather...</option>
+                                {% for w in weathers %}
+                                <option value="{{ w }}">{{ w }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute right-4 text-stone-400 pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Festival Flag -->
+                    <div class="space-y-3 md:col-span-2 pt-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">Festival / Holiday
+                            Variance</label>
+                        <div class="flex p-1.5 rounded-xl bg-stone-100 border border-stone-200">
+                            <label class="flex-1 text-center cursor-pointer relative">
+                                <input type="radio" name="festival" value="0" checked class="peer sr-only">
+                                <div
+                                    class="py-2.5 rounded-lg text-sm font-bold text-stone-500 peer-checked:bg-white peer-checked:text-[#2d6a4f] peer-checked:shadow-sm transition-all flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                        <path d="M3 9h18" />
+                                        <path d="M9 21V9" />
+                                    </svg>
+                                    Standard Day
+                                </div>
                             </label>
-                            <label class="toggle-option">
-                                <input type="radio" name="festival" value="1">
-                                <span class="toggle-label">Yes</span>
+                            <label class="flex-1 text-center cursor-pointer relative">
+                                <input type="radio" name="festival" value="1" class="peer sr-only">
+                                <div
+                                    class="py-2.5 rounded-lg text-sm font-bold text-stone-500 peer-checked:bg-amber-100 peer-checked:text-amber-800 peer-checked:shadow-sm transition-all flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    Festival Day
+                                </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="expected_customers">
-                            <span class="label-icon">👥</span> Expected Customers
-                        </label>
-                        <input type="number" name="expected_customers" id="expected_customers" min="50" max="1000"
-                            placeholder="e.g. 400" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="prev_day">
-                            <span class="label-icon">⏮️</span> Previous Day Consumption
-                        </label>
-                        <input type="number" name="prev_day" id="prev_day" min="0" max="1000" placeholder="e.g. 350"
-                            required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="prev_week">
-                            <span class="label-icon">📆</span> Previous Week Same Day
-                        </label>
-                        <input type="number" name="prev_week" id="prev_week" min="0" max="1000" placeholder="e.g. 370"
-                            required>
-                    </div>
                 </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg" id="btn-predict">
-                        <span class="btn-icon">🔮</span> Predict Meals
-                    </button>
-                </div>
-            </form>
-
-            <div class="smart-tip" id="smart-tip" style="display:none;">
-                <span class="tip-icon">💡</span>
-                <span class="tip-text" id="tip-text"></span>
             </div>
-        </div>
-    </section>
 
-    <footer class="footer">
-        <p>Smart Food Waste Prediction System &copy; 2026</p>
-    </footer>
+            <!-- SECTION 2: Consumption logic -->
+            <div class="space-y-8 pt-6">
+                <!-- Section Title -->
+                <div class="flex items-center gap-4 border-b border-stone-100 pb-4">
+                    <div
+                        class="h-12 w-12 bg-[#fff3e0] text-[#e65100] rounded-2xl flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18" />
+                            <path d="m19 9-5 5-4-4-3 3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-stone-800">2. Consumption Baselines</h2>
+                        <p class="text-sm text-stone-500">Input preceding operational volumes and expected footfall.</p>
+                    </div>
+                </div>
 
-    <script>
-        // Dynamic smart tips based on input
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- T-1 -->
+                    <div class="space-y-2 relative group md:col-span-1">
+                        <label for="prev_day" class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">T-1
+                            Consumption (Yesterday)</label>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#e65100] transition-colors pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M12 20h9" />
+                                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                                </svg>
+                            </div>
+                            <input type="number" name="prev_day" id="prev_day" min="0" max="5000" placeholder="e.g. 350"
+                                required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-12 pr-12 text-stone-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff9800] focus:border-[#ff9800] hover:border-stone-300">
+                            <div class="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">Meals
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- W-1 -->
+                    <div class="space-y-2 relative group md:col-span-1">
+                        <label for="prev_week"
+                            class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">W-1 Same Day (Last
+                            Week)</label>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#e65100] transition-colors pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                            </div>
+                            <input type="number" name="prev_week" id="prev_week" min="0" max="5000"
+                                placeholder="e.g. 400" required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-12 pr-12 text-stone-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff9800] focus:border-[#ff9800] hover:border-stone-300">
+                            <div class="absolute right-4 text-xs font-bold text-stone-400 pointer-events-none">Meals
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expected Guests -->
+                    <div class="space-y-2 relative group md:col-span-2">
+                        <label for="expected_customers"
+                            class="text-xs font-bold uppercase tracking-wider text-stone-500 ml-1">Expected Footfall /
+                            Attendance</label>
+                        <div class="relative flex items-center">
+                            <div
+                                class="absolute left-4 text-stone-400 group-focus-within:text-[#e65100] transition-colors pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                            </div>
+                            <input type="number" name="expected_customers" id="expected_customers" min="10" max="5000"
+                                placeholder="e.g. 450" required
+                                class="w-full bg-stone-50 border border-stone-200 rounded-xl py-4 pl-12 pr-16 text-stone-800 text-lg font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-[#ffcc80] focus:border-[#ff9800] hover:border-stone-300">
+                            <div class="absolute right-4 text-sm font-bold text-stone-400 pointer-events-none">People
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buffer -->
+                    <div
+                        class="space-y-2 relative group md:col-span-2 bg-[#f8fafc] p-5 rounded-2xl border border-blue-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="safety_buffer"
+                                class="text-xs font-bold uppercase tracking-wider text-blue-800 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                </svg>
+                                Safety Buffer Margin
+                            </label>
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-100 px-2 py-0.5 rounded">Optional</span>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <input type="range" id="buffer_slider" min="0" max="50" value="0"
+                                class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="relative w-24">
+                                <input type="number" name="safety_buffer" id="safety_buffer" min="0" max="50" value="0"
+                                    class="w-full bg-white border border-blue-200 rounded-lg py-2 pl-3 pr-8 text-blue-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">
+                                <span class="absolute right-3 top-2.5 text-xs text-blue-400 font-bold">%</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-blue-600 mt-2">Optional overall percentage increase to mitigate shortage
+                            risk.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Smart Tip -->
+            <div id="smart-tip-panel"
+                class="rounded-2xl border border-[#b7e4c7] bg-[#ebfbee] p-5 flex items-start gap-4 shadow-[0_4px_14px_rgba(45,106,79,0.08)] transform origin-bottom transition-all duration-300 scale-95 opacity-0">
+                <div class="text-[#2d6a4f] mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-[#1b4332] uppercase tracking-wide mb-1">Live Engine Insight</h4>
+                    <p id="tip-text" class="text-sm text-[#2d6a4f] font-medium leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- Submit button -->
+            <div class="pt-4 border-t border-stone-100 flex justify-end">
+                <button type="submit" form="predict-form"
+                    class="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#1b4332] hover:bg-[#081c15] text-white px-10 py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-900/20 transition-all hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-green-900/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                    </svg>
+                    Compile Forecast Output ✦
+                </button>
+            </div>
+
+        </form>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Slider sync
+        const slider = document.getElementById('buffer_slider');
+        const numberInput = document.getElementById('safety_buffer');
+
+        slider.addEventListener('input', (e) => numberInput.value = e.target.value);
+        numberInput.addEventListener('input', (e) => slider.value = e.target.value);
+
+        // Smart Tips
         const tips = {
-            'Rainy': 'Rainy weather usually reduces dining demand by ~25%.',
-            'Stormy': 'Stormy conditions can cut demand by up to 40%.',
-            'Friday': 'Demand is usually higher on Fridays.',
-            'Saturday': 'Weekend days often show different consumption patterns.',
-            'Sunday': 'Sunday dining patterns can be unpredictable.',
+            'Rainy': 'Nature anomaly: High rain detected. Model expects a severe drop in walk-in traffic (approx 25%).',
+            'Stormy': 'Severe weather alert. Adjusting expected demand and logistics down by up to 40%.',
+            'Friday': 'Weekend preamble sequence loaded. T-1 analysis often shows peak spikes.',
+            'Saturday': 'Core weekend pattern activated. Major baseline shift relative to weekday averages.',
+            'Sunday': 'High variance rest-day profile active. Recommend keeping organic buffets tighter.',
         };
 
+        const dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let activeTip = "";
+
         function showTip(text) {
-            const el = document.getElementById('smart-tip');
-            document.getElementById('tip-text').textContent = text;
-            el.style.display = 'flex';
-            el.classList.add('tip-animate');
+            if (activeTip === text) return;
+            activeTip = text;
+
+            const tipEl = document.getElementById('tip-text');
+            const panelEl = document.getElementById('smart-tip-panel');
+
+            // Set content and animate panel in
+            tipEl.textContent = text;
+            panelEl.classList.remove('scale-95', 'opacity-0');
+            panelEl.classList.add('scale-100', 'opacity-100');
         }
+
+        // Auto-update Day based on Date
+        document.getElementById('date').addEventListener('change', function () {
+            if (this.value) {
+                const date = new Date(this.value);
+                const dayName = dayMap[date.getUTCDay()];
+                const daySelect = document.getElementById('day');
+                if (dayName) {
+                    daySelect.value = dayName;
+                    daySelect.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+
+        // Trigger on load if date is set
+        window.addEventListener('load', () => {
+            const dateInput = document.getElementById('date');
+            if (dateInput.value) {
+                dateInput.dispatchEvent(new Event('change'));
+            }
+        });
 
         document.getElementById('weather').addEventListener('change', function () {
             if (tips[this.value]) showTip(tips[this.value]);
@@ -148,7 +428,38 @@
         document.getElementById('day').addEventListener('change', function () {
             if (tips[this.value]) showTip(tips[this.value]);
         });
-    </script>
-</body>
+    });
+</script>
 
-</html>
+<style>
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}

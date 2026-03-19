@@ -7,69 +7,131 @@
     <title>{% block title %}PrepNova | Elite Operational Intelligence{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+
+    <!-- Original CSS (for analytics/history) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Motion One (Vanilla Framer Motion) -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#FAFAF9', /* warm stone 50 */
+                        foreground: '#1C1917', /* ink base */
+                        card: '#ffffff',
+                        'card-foreground': '#1C1917',
+                        popover: '#ffffff',
+                        'popover-foreground': '#1C1917',
+                        primary: '#3F6212', /* moss green */
+                        'primary-foreground': '#ffffff',
+                        secondary: '#F5F5F4', /* stone 100 */
+                        'secondary-foreground': '#4D7C0F',
+                        muted: '#F5F5F4',
+                        'muted-foreground': '#57534E',
+                        accent: '#92400E', /* earth accent */
+                        'accent-foreground': '#ffffff',
+                        destructive: '#991B1B',
+                        'destructive-foreground': '#ffffff',
+                        border: '#E7E5E4', /* stone 200 */
+                        input: '#E7E5E4',
+                        ring: '#3F6212',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Instrument Serif', 'serif'],
+                    },
+                    borderRadius: {
+                        lg: '0.75rem',
+                        md: '0.5rem',
+                        sm: '0.25rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background text-foreground font-sans antialiased;
+            }
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-serif font-normal;
+            }
+        }
+    </style>
     {% block head %}{% endblock %}
 </head>
 
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="/" class="brand-link">
-                <span style="color: var(--primary-vibrant);">✦</span> PrepNova
+<body class="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
+    <!-- Shadcn-styled Navbar -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
+            <a href="/"
+                class="flex items-center gap-2 font-serif text-2xl tracking-tight text-primary transition-opacity hover:opacity-80">
+                <span class="text-accent">✦</span> PrepNova
             </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                <a href="/"
+                    class="transition-colors hover:text-foreground/80 {% if request.path == '/' %}text-foreground{% else %}text-foreground/60{% endif %}">Home</a>
+                <a href="/predict"
+                    class="transition-colors hover:text-foreground/80 {% if request.path == '/predict' %}text-foreground{% else %}text-foreground/60{% endif %}">Engine</a>
+                <a href="/history"
+                    class="transition-colors hover:text-foreground/80 {% if request.path == '/history' %}text-foreground{% else %}text-foreground/60{% endif %}">History</a>
+                <a href="/analytics"
+                    class="transition-colors hover:text-foreground/80 {% if request.path == '/analytics' %}text-foreground{% else %}text-foreground/60{% endif %}">Analytics</a>
+            </nav>
         </div>
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
-            <li><a href="/predict" class="nav-link {% if request.path == '/predict' %}active{% endif %}">Engine</a></li>
-            <li><a href="/history" class="nav-link {% if request.path == '/history' %}active{% endif %}">History</a>
-            </li>
-            <li><a href="/analytics"
-                    class="nav-link {% if request.path == '/analytics' %}active{% endif %}">Analytics</a></li>
-        </ul>
-    </nav>
+    </header>
 
-    <main class="animate-up">
+    <main class="flex-1">
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <h2>PrepNova</h2>
-                <p>Advanced supply chain optimization using state-of-the-art machine learning models. Built for
-                    precision, designed for sustainability.</p>
+    <!-- Shadcn-styled Footer -->
+    <footer class="border-t border-border bg-card text-card-foreground">
+        <div class="container mx-auto px-4 sm:px-8 py-12 md:py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2 space-y-4">
+                    <h2 class="font-serif text-2xl text-primary">PrepNova</h2>
+                    <p class="text-sm text-muted-foreground leading-relaxed max-w-sm">
+                        Advanced supply chain optimization using state-of-the-art machine learning models. Built for
+                        precision, designed for sustainability.
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold tracking-wider uppercase text-foreground">Product</h3>
+                    <ul class="space-y-3 text-sm text-muted-foreground">
+                        <li><a href="/predict" class="hover:text-primary transition-colors">Demand Engine</a></li>
+                        <li><a href="/analytics" class="hover:text-primary transition-colors">Analytics BI</a></li>
+                        <li><a href="/history" class="hover:text-primary transition-colors">Operational History</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold tracking-wider uppercase text-foreground">Connect</h3>
+                    <ul class="space-y-3 text-sm text-muted-foreground">
+                        <li><a href="#" class="hover:text-primary transition-colors">Intelligence Hub</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Operations Team</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Request Audit</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="footer-links">
-                <h3>Product</h3>
-                <ul>
-                    <li><a href="/predict">Demand Engine</a></li>
-                    <li><a href="/analytics">Analytics BI</a></li>
-                    <li><a href="/history">Operational History</a></li>
-                </ul>
+            <div
+                class="mt-12 pt-8 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                <p>&copy; 2026 PrepNova Intelligence Systems.</p>
+                <p>Distributed Operational Protocol Enabled.</p>
             </div>
-            <div class="footer-links">
-                <h3>Global</h3>
-                <ul>
-                    <li><a href="#">Security Protocol</a></li>
-                    <li><a href="#">API Documentation</a></li>
-                    <li><a href="#">Cloud Status</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h3>Connect</h3>
-                <ul>
-                    <li><a href="#">Intelligence Hub</a></li>
-                    <li><a href="#">Operations Team</a></li>
-                    <li><a href="#">Request Audit</a></li>
-                </ul>
-            </div>
-        </div>
-        <div
-            style="text-align: center; margin-top: 6rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em;">
-            <p>&copy; 2026 PrepNova Intelligence Systems. Distributed Operational Protocol Enabled.</p>
         </div>
     </footer>
 

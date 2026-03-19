@@ -16,13 +16,27 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import joblib
 
-# Try importing xgboost, fall back gracefully
+# Try importing advanced regressors, fall back gracefully
 try:
     from xgboost import XGBRegressor
     HAS_XGB = True
 except ImportError:
     HAS_XGB = False
     print("⚠ XGBoost not available, skipping XGB model.")
+
+try:
+    from lightgbm import LGBMRegressor
+    HAS_LGBM = True
+except ImportError:
+    HAS_LGBM = False
+    print("⚠ LightGBM not available.")
+
+try:
+    from catboost import CatBoostRegressor
+    HAS_CAT = True
+except ImportError:
+    HAS_CAT = False
+    print("⚠ CatBoost not available.")
 
 # ── Paths ──────────────────────────────────────────────────────────────
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -144,6 +158,18 @@ if HAS_XGB:
     xgb.fit(X_train, y_train)
     estimators.append(('xgb', xgb))
 
+if HAS_LGBM:
+    print("Training LightGBM...")
+    lgbm = LGBMRegressor(n_estimators=300, learning_rate=0.05, max_depth=7, random_state=42, verbose=-1)
+    lgbm.fit(X_train, y_train)
+    estimators.append(('lgbm', lgbm))
+
+if HAS_CAT:
+    print("Training CatBoost...")
+    cat = CatBoostRegressor(n_estimators=300, learning_rate=0.05, depth=6, random_state=42, verbose=0)
+    cat.fit(X_train, y_train)
+    estimators.append(('cat', cat))
+
 print("Training Stacking Ensemble...")
 stack_reg = StackingRegressor(
     estimators=estimators,
@@ -159,6 +185,10 @@ models = {
 
 if HAS_XGB:
     models['XGBoost'] = xgb
+if HAS_LGBM:
+    models['LightGBM'] = lgbm
+if HAS_CAT:
+    models['CatBoost'] = cat
 
 # ── 4. Evaluation ─────────────────────────────────────────────────────
 results = {}

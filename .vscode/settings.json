@@ -1,0 +1,7 @@
+{
+    "python.defaultInterpreterPath": "/home/kali/Documents/prepnova/venv/bin/python3",
+    "python.analysis.extraPaths": [
+        "/home/kali/Documents/prepnova/app"
+    ],
+    "python.terminal.activateEnvInCurrentTerminal": true
+}

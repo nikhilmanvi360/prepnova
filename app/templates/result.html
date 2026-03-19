@@ -1,135 +1,441 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
+{% block title %}Forecast Report — PrepNova Intelligence{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Result — FoodWasteAI</title>
-    <meta name="description" content="Your meal demand prediction results and insights">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block content %}
+<div class="relative w-full min-h-screen bg-stone-50 pb-32">
 
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <span class="nav-icon">🍽️</span>
-            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
-        </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/predict" class="nav-link">Predict</a>
-            <a href="/analytics" class="nav-link">Analytics</a>
-        </div>
-    </nav>
+    <!-- Expansive Result Hero with Farm UI Gradient -->
+    <section
+        class="relative mx-auto flex min-h-[70vh] max-w-[1440px] flex-col lg:flex-row items-stretch border-b border-border shadow-sm bg-white"
+        id="result-hero-section">
 
-    <section class="result-section">
-        <div class="result-container">
-            <!-- Main Prediction Card -->
-            <div class="result-hero">
-                <div class="result-badge">✅ Prediction Complete</div>
-                <div class="result-main">
-                    <div class="result-label">Recommended Meals to Prepare</div>
-                    <div class="result-number" id="result-number">{{ predicted }}</div>
-                    <div class="result-confidence confidence-{{ confidence|lower }}">
-                        Confidence Level: <strong>{{ confidence }}</strong>
-                    </div>
-                </div>
+        <!-- Left: Major Figure -->
+        <div
+            class="flex-1 px-6 lg:px-20 py-24 flex flex-col justify-center bg-gradient-to-br from-[#1b4332] via-[#2d6a4f] to-[#081c15] relative overflow-hidden">
+            <!-- Subtle Pattern overlay -->
+            <div class="absolute inset-0 opacity-[0.03]"
+                style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
             </div>
 
-            <!-- Input Summary -->
-            <div class="result-grid">
-                <div class="info-card">
-                    <h3>📋 Input Summary</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Day</span>
-                            <span class="info-value">{{ inputs.day }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Weather</span>
-                            <span class="info-value">{{ inputs.weather }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Festival</span>
-                            <span class="info-value">{{ inputs.festival }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Expected Customers</span>
-                            <span class="info-value">{{ inputs.expected_customers }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Prev Day Consumption</span>
-                            <span class="info-value">{{ inputs.prev_day }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Prev Week Same Day</span>
-                            <span class="info-value">{{ inputs.prev_week }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {% if waste_estimate > 0 %}
-                <div class="info-card warning-card">
-                    <h3>⚠️ Waste Alert</h3>
-                    <div class="waste-info">
-                        <div class="waste-number">~{{ waste_estimate }}</div>
-                        <div class="waste-label">Estimated meals wasted if {{ inputs.expected_customers }} prepared
-                        </div>
-                    </div>
-                    <p class="waste-tip">Prepare <strong>{{ predicted }}</strong> meals instead to minimize waste.</p>
-                </div>
-                {% endif %}
+            <div id="result-badge"
+                class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-[#d8f3dc] backdrop-blur-sm z-10 w-fit">
+                <span class="mr-1 h-2 w-2 rounded-full bg-[#52b788] animate-pulse"></span>
+                Analysis Complete
             </div>
 
-            <!-- Smart Tips -->
-            {% if tips %}
-            <div class="tips-section">
-                <h3>💡 Smart Insights</h3>
-                <div class="tips-grid">
-                    {% for tip in tips %}
-                    <div class="tip-card tip-{{ tip.type }}">
-                        <span class="tip-card-icon">{{ tip.icon }}</span>
-                        <p>{{ tip.text }}</p>
-                    </div>
-                    {% endfor %}
+            <h2
+                class="text-sm font-semibold tracking-[0.2em] text-[#b7e4c7] uppercase mb-6 z-10 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Recommended Yield
+            </h2>
+
+            <div class="flex items-baseline gap-4 z-10">
+                <div class="text-[8rem] sm:text-[10rem] lg:text-[12rem] font-serif text-white leading-none tracking-tighter tabular-nums"
+                    id="result-number">
+                    {{ final_recommendation }}
                 </div>
+                <div class="text-2xl font-serif text-[#b7e4c7] italic">Meals</div>
+            </div>
+
+            <p class="mt-8 max-w-[450px] text-lg text-[#d8f3dc]/80 leading-relaxed z-10">
+                Our ensemble models have converged on this optimal preparation volume based on current environmental
+                vectors and historical consumption drift.
+            </p>
+
+            {% if inputs.safety_buffer > 0 %}
+            <div
+                class="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-500/20 border border-blue-400/30 px-4 py-3 text-xs font-bold text-blue-100 uppercase tracking-widest z-10 w-fit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                </svg>
+                +{{ inputs.safety_buffer }}% Safety Buffer Applied
             </div>
             {% endif %}
+        </div>
 
-            <!-- Actions -->
-            <div class="result-actions">
-                <a href="/predict" class="btn btn-primary" id="btn-new-prediction">
-                    <span class="btn-icon">🔄</span> New Prediction
-                </a>
-                <a href="/analytics" class="btn btn-secondary" id="btn-go-analytics">
-                    <span class="btn-icon">📊</span> View Analytics
-                </a>
+        <!-- Right: Statistical Breakdown -->
+        <div
+            class="lg:w-[450px] bg-white p-12 flex flex-col justify-center gap-12 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] border-l border-stone-100">
+
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                        <path d="M22 12A10 10 0 0 0 12 2v10z" />
+                    </svg>
+                    Probabilistic Range
+                </h3>
+                <div class="flex items-end justify-between border-b border-stone-100 pb-6">
+                    <span class="text-4xl font-serif text-stone-800">{{ ci_min }} <span
+                            class="text-lg text-stone-400 mx-2">—</span> {{ ci_max }}</span>
+                    <span
+                        class="text-[10px] font-bold tracking-widest uppercase text-[#2d6a4f] bg-[#e8f5e9] px-2 py-1 rounded-md mb-1">95%
+                        Conf.</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                    Confidence Level
+                </h3>
+                <div class="flex items-center gap-4">
+                    {% set conf_bg = 'bg-[#1b4332] text-white' if confidence == 'High' else ('bg-amber-500 text-white'
+                    if confidence == 'Medium' else 'bg-red-500 text-white') %}
+                    {% set conf_bar = 'bg-[#1b4332] w-full' if confidence == 'High' else ('bg-amber-500 w-2/3' if
+                    confidence == 'Medium' else 'bg-red-500 w-1/3') %}
+
+                    <div class="h-2.5 flex-1 rounded-full bg-stone-100 overflow-hidden border border-stone-200">
+                        <div class="h-full {{ conf_bar }} rounded-full shadow-inner"></div>
+                    </div>
+                    <span
+                        class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-lg {{ conf_bg }} shadow-sm">{{
+                        confidence }}</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                    AI Baseline Focus
+                </h3>
+                <div class="text-2xl font-serif text-stone-800 flex items-end">
+                    {{ predicted }}
+                    <span
+                        class="text-[10px] font-bold tracking-widest uppercase text-stone-400 bg-stone-100 px-2 py-1 rounded-md ml-3 mb-1">Raw
+                        Est.</span>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-10 border-t border-stone-100">
+                <div class="flex flex-col gap-4">
+                    <a href="/predict"
+                        class="w-full h-14 flex justify-center items-center rounded-xl bg-[#1b4332] text-white font-bold tracking-wide transition-all shadow-lg shadow-green-900/10 hover:bg-[#081c15] hover:-translate-y-0.5 gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                            <path d="M3 3v5h5" />
+                        </svg>
+                        Adjust Parameters
+                    </a>
+                    <a href="/history"
+                        class="w-full h-14 flex justify-center items-center rounded-xl bg-white border border-stone-200 text-stone-700 font-bold tracking-wide transition-all hover:bg-stone-50 hover:text-stone-900 gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                        View Audit Log
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer class="footer">
-        <p>Smart Food Waste Prediction System &copy; 2026</p>
-    </footer>
+    <!-- Detailed Insights Grid -->
+    <section class="max-w-6xl mx-auto px-6 mt-16 pb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-    <script>
-        // Animate the result number counting up
+            <!-- Environment Ledger -->
+            <div
+                class="rounded-[2rem] border border-stone-200 bg-white p-8 space-y-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative">
+
+                <div class="flex items-center gap-4 border-b border-stone-100 pb-4">
+                    <div
+                        class="h-10 w-10 bg-[#e8f5e9] text-[#2d6a4f] rounded-xl flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-stone-800">Operational Context</h3>
+                        <p class="text-xs text-stone-400 mt-1 uppercase tracking-wider">Submitted Parameters</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div
+                        class="flex justify-between items-center py-3 bg-stone-50 px-4 rounded-xl border border-stone-100">
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-widest">Target Window</span>
+                        <span class="text-sm font-bold text-stone-800">{{ inputs.day }}</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center py-3 bg-stone-50 px-4 rounded-xl border border-stone-100">
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-widest">Weather Vector</span>
+                        <span class="text-sm font-bold text-stone-800 flex items-center gap-2">
+                            {% if inputs.weather == 'Sunny' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" class="text-amber-500" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2" />
+                                <path d="M12 20v2" />
+                                <path d="m4.93 4.93 1.41 1.41" />
+                                <path d="m17.66 17.66 1.41 1.41" />
+                                <path d="M2 12h2" />
+                                <path d="M20 12h2" />
+                                <path d="m6.34 17.66-1.41 1.41" />
+                                <path d="m19.07 4.93-1.41 1.41" />
+                            </svg>
+                            {% elif inputs.weather == 'Rainy' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" class="text-blue-500" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9" />
+                                <path d="M16 14v6" />
+                                <path d="M8 14v6" />
+                                <path d="M12 16v6" />
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" class="text-indigo-500" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                            </svg>
+                            {% endif %}
+                            {{ inputs.weather }}
+                        </span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center py-3 bg-stone-50 px-4 rounded-xl border border-stone-100">
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-widest">Footfall
+                            Expectation</span>
+                        <span class="text-sm font-bold text-stone-800">{{ inputs.expected_customers }}</span>
+                    </div>
+                    <div
+                        class="flex justify-between items-center py-3 bg-stone-50 px-4 rounded-xl border border-stone-100">
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-widest">Festival
+                            Variance</span>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest {% if inputs.festival == 1 %}bg-amber-100 text-amber-800 border-amber-200{% else %}bg-stone-200 text-stone-600{% endif %} border">
+                            {% if inputs.festival == 1 %}Active{% else %}Standard{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Anomaly Warning if exists -->
+                {% if is_anomaly %}
+                <div class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 flex items-start gap-4">
+                    <div class="text-red-500 mt-0.5 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                            <path d="M12 9v4" />
+                            <path d="M12 17h.01" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-red-900 uppercase tracking-widest mb-1">Anomaly Target
+                            Detected</h4>
+                        <p class="text-xs text-red-800 leading-relaxed">
+                            Footfall projections distinctly exceed standard operational variance. Assuming
+                            highest-stress consumption profile.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Behavioral Insights -->
+            <div
+                class="rounded-[2rem] border border-stone-200 bg-white p-8 space-y-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full flex flex-col">
+                <div class="flex items-center gap-4 border-b border-stone-100 pb-4 mb-2">
+                    <div
+                        class="h-10 w-10 bg-[#fff3e0] text-[#e65100] rounded-xl flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <path d="m10 13-2 2 2 2" />
+                            <path d="m14 17 2-2-2-2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-stone-800">Behavioral Insight Map
+                        </h3>
+                        <p class="text-xs text-stone-400 mt-1 uppercase tracking-wider">Engine Diagnostic</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                    {% if tips %}
+                    {% for tip in tips %}
+                    <div
+                        class="rounded-xl border border-stone-100 bg-[#f8fafc] p-4 flex items-start gap-3 hover:border-[#b7e4c7] hover:bg-[#ebfbee] transition-colors group">
+                        <span class="text-xl group-hover:scale-110 transition-transform origin-top-left">{{ tip.icon
+                            }}</span>
+                        <div>
+                            <h4 class="text-[10px] font-bold uppercase tracking-widest text-[#2d6a4f] mb-1 opacity-80">
+                                {{ tip.icon_name|default('Analysis') }}</h4>
+                            <p class="text-sm text-stone-700 font-medium leading-relaxed">{{ tip.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div
+                        class="flex-1 flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-stone-200 rounded-2xl bg-stone-50/50">
+                        <div
+                            class="h-12 w-12 bg-stone-200 rounded-full flex items-center justify-center text-stone-400 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                            </svg>
+                        </div>
+                        <p class="text-sm font-bold text-stone-500 uppercase tracking-widest">Standard Baseline
+                            Condition</p>
+                        <p class="text-xs text-stone-400 mt-2 max-w-[250px]">No unique behavioral perturbations detected
+                            in current vector array.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Deep Waste Impact Map (Full width block) -->
+            <div
+                class="md:col-span-2 rounded-[2rem] border border-[#b7e4c7] bg-[#f6fff8] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-hidden shadow-sm relative group">
+                <!-- Subtle leaf pattern in bg -->
+                <div
+                    class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-700">
+                    <svg width="300" height="300" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                </div>
+
+                <div class="flex-1 relative z-10 w-full">
+                    {% if waste_estimate > 0 %}
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="px-3 py-1 bg-amber-100 text-amber-800 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-amber-200">
+                            Efficiency Mitigation</div>
+                    </div>
+                    <h3 class="text-2xl font-serif text-stone-800 mb-3">Eliminating Material Surplus</h3>
+                    <p class="text-stone-600 leading-relaxed max-w-[80%]">
+                        Based on your input of {{ inputs.expected_customers }} expected footfall, preparing an
+                        un-optimized baseline volume would likely generate severe environmental toll via
+                        over-preparation.
+                    </p>
+                    {% else %}
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="px-3 py-1 bg-[#d8f3dc] text-[#1b4332] rounded-lg text-[10px] font-bold uppercase tracking-widest border border-[#b7e4c7]">
+                            Optimal State Status</div>
+                    </div>
+                    <h3 class="text-2xl font-serif text-stone-800 mb-3">Perfect Operational Equilibrium</h3>
+                    <p class="text-stone-600 leading-relaxed max-w-[80%]">
+                        The predicted volume aligns perfectly with the current operational vector demands. Material
+                        waste profile is neutralized.
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="w-px h-32 bg-stone-200 hidden md:block z-10"></div>
+
+                <div class="flex flex-col items-center md:items-end z-10 w-full md:w-auto text-center md:text-right">
+                    {% if waste_estimate > 0 %}
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-stone-400 mb-2">Preventable Loss
+                        Vector</span>
+                    <div class="flex items-baseline gap-3">
+                        <span class="text-6xl md:text-7xl font-serif text-amber-600">~{{ waste_estimate }}</span>
+                        <span class="text-sm font-bold text-stone-500 uppercase tracking-widest">Meals</span>
+                    </div>
+                    {% else %}
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-stone-400 mb-2">Deviation
+                        Marker</span>
+                    <div class="flex items-baseline gap-3">
+                        <span class="text-6xl md:text-7xl font-serif text-[#2d6a4f]">0.0</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Custom Scrollbar for insight map */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #e5e7eb;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const { animate, stagger } = Motion;
+
+        // Number counting animation
         const el = document.getElementById('result-number');
-        const target = parseInt(el.textContent);
-        let current = 0;
-        const step = Math.ceil(target / 40);
-        const interval = setInterval(() => {
-            current += step;
-            if (current >= target) {
-                current = target;
-                clearInterval(interval);
-            }
-            el.textContent = current;
-        }, 25);
-    </script>
-</body>
+        if (el) {
+            const target = parseInt(el.textContent);
+            let current = 0;
+            const duration = 2000;
+            const startTime = performance.now();
 
-</html>
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease out expo
+                const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+
+                current = Math.floor(easeOut * target);
+                // Number formatter
+                el.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    el.textContent = target; // ensure final exact number
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Entrance animations
+        animate(
+            "#result-hero-section",
+            { opacity: [0, 1] },
+            { duration: 0.6, easing: "ease-out" }
+        );
+
+        animate(
+            "section.max-w-6xl > div > div",
+            { opacity: [0, 1], y: [30, 0] },
+            { duration: 0.8, delay: stagger(0.15), easing: "ease-out" }
+        );
+    });
+</script>
+{% endblock %}

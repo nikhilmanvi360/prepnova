@@ -1,85 +1,223 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "layout.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard — FoodWasteAI</title>
-    <meta name="description" content="Analytics dashboard with insights from food consumption data">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-</head>
+{% block title %}Analytics Dashboard — PrepNova Intelligence{% endblock %}
 
-<body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <span class="nav-icon">🍽️</span>
-            <span class="nav-title">FoodWaste<span class="accent">AI</span></span>
-        </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/predict" class="nav-link">Predict</a>
-            <a href="/analytics" class="nav-link active">Analytics</a>
-        </div>
-    </nav>
+{% block content %}
+<div class="relative w-full min-h-screen bg-stone-50 pb-32">
 
-    <section class="analytics-section">
-        <div class="analytics-header">
-            <div class="form-badge">📊 Data Analytics</div>
-            <h1>Analytics Dashboard</h1>
-            <p>Insights from {{ total_rows }} data points of historical food consumption.</p>
+    <!-- Hero Header - Nature Theme (Lush greens) -->
+    <header
+        class="bg-gradient-to-br from-[#1b4332] via-[#2d6a4f] to-[#081c15] pt-24 pb-28 px-6 sm:px-12 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 opacity-[0.03]"
+            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
         </div>
+
+        <div class="max-w-7xl mx-auto relative z-10 text-center animate-fade-in-up">
+            <span
+                class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#d8f3dc] mb-6 backdrop-blur-sm border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v18h18" />
+                    <path d="m19 9-5 5-4-4-3 3" />
+                </svg>
+                Data Analytics
+            </span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6">
+                Intelligence Dashboard
+            </h1>
+            <p class="text-[#b7e4c7] text-lg max-w-2xl mx-auto leading-relaxed">
+                Analyzing {{ total_rows }} data points of historical food consumption, crop cycles, and environmental
+                variances.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 max-w-7xl -mt-16 relative z-20 space-y-12">
 
         <!-- Model Performance Summary -->
-        <div class="model-summary">
-            <div class="model-card best-model">
-                <div class="model-badge">🏆 Best Model</div>
-                <h3>{{ best_model }}</h3>
-                <div class="model-stats">
-                    {% for name, metrics in model_results.items() %}
-                    <div class="model-stat {{ 'highlight' if name == best_model else '' }}">
-                        <span class="model-name">{{ name }}</span>
-                        <span class="model-metric">MAE: {{ "%.1f"|format(metrics.MAE) }}</span>
-                        <span class="model-metric">RMSE: {{ "%.1f"|format(metrics.RMSE) }}</span>
+        <div class="rounded-[2.5rem] border border-stone-200 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden animate-fade-in-up"
+            id="best-model-card">
+            <div
+                class="bg-[#f8fafc] px-8 py-5 border-b border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 bg-[#e8f5e9] text-[#2d6a4f] rounded-xl flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
                     </div>
-                    {% endfor %}
+                    <h3 class="text-sm font-bold tracking-widest uppercase text-stone-800">Engine Evaluation</h3>
                 </div>
+                <span
+                    class="inline-flex items-center gap-2 rounded-lg bg-[#d8f3dc] px-4 py-2 text-xs font-bold text-[#1b4332] border border-[#b7e4c7]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                        <path d="M4 22h16" />
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                    </svg>
+                    Champion Model: {{ best_model }}
+                </span>
+            </div>
+
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stone-100">
+                {% for name, metrics in model_results.items() %}
+                <div
+                    class="p-8 flex flex-col items-center justify-center text-center {{ 'bg-[#f6fff8]' if name == best_model else 'hover:bg-stone-50 transition-colors' }}">
+                    <span class="text-sm font-bold text-stone-800 mb-6 tabular-nums">{{ name }}</span>
+                    <div class="flex gap-8 w-full justify-center">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">MAE</span>
+                            <span
+                                class="text-3xl font-serif mt-1 {{ 'text-[#2d6a4f]' if name == best_model else 'text-stone-700' }}">{{
+                                "%.1f"|format(metrics.MAE) }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">RMSE</span>
+                            <span
+                                class="text-3xl font-serif mt-1 {{ 'text-[#2d6a4f]' if name == best_model else 'text-stone-700' }}">{{
+                                "%.1f"|format(metrics.RMSE) }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
         <!-- Chart Grid -->
-        <div class="chart-grid">
-            <div class="chart-card">
-                <h3>📅 Average Meals by Weekday</h3>
-                <canvas id="chart-weekday"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="chart-grid">
+
+            <div class="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm flex flex-col opacity-0 group">
+                <h3
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-6 flex items-center gap-3">
+                    <div
+                        class="p-1.5 rounded-lg bg-stone-100 text-stone-400 group-hover:bg-[#e8f5e9] group-hover:text-[#2d6a4f] transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                            <line x1="16" x2="16" y1="2" y2="6" />
+                            <line x1="8" x2="8" y1="2" y2="6" />
+                            <line x1="3" x2="21" y1="10" y2="10" />
+                        </svg></div>
+                    Average Yield by Weekday
+                </h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="chart-weekday"></canvas>
+                </div>
             </div>
-            <div class="chart-card">
-                <h3>🌤️ Weather Impact on Demand</h3>
-                <canvas id="chart-weather"></canvas>
+
+            <div class="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm flex flex-col opacity-0 group">
+                <h3
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-6 flex items-center gap-3">
+                    <div
+                        class="p-1.5 rounded-lg bg-stone-100 text-stone-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                        </svg></div>
+                    Atmospheric Impact on Demand
+                </h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="chart-weather"></canvas>
+                </div>
             </div>
-            <div class="chart-card">
-                <h3>🎉 Festival vs Non-Festival</h3>
-                <canvas id="chart-festival"></canvas>
+
+            <div class="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm flex flex-col opacity-0 group">
+                <h3
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-6 flex items-center gap-3">
+                    <div
+                        class="p-1.5 rounded-lg bg-stone-100 text-stone-400 group-hover:bg-amber-50 group-hover:text-amber-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg></div>
+                    Operational Variance Drift
+                </h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="chart-festival"></canvas>
+                </div>
             </div>
-            <div class="chart-card">
-                <h3>👥 Customers vs Meals Consumed</h3>
-                <canvas id="chart-scatter"></canvas>
+
+            <div class="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm flex flex-col opacity-0 group">
+                <h3
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-6 flex items-center gap-3">
+                    <div
+                        class="p-1.5 rounded-lg bg-stone-100 text-stone-400 group-hover:bg-orange-50 group-hover:text-orange-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg></div>
+                    Guests vs Actual Consumption
+                </h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="chart-scatter"></canvas>
+                </div>
             </div>
-            <div class="chart-card chart-wide">
-                <h3>🏆 Model Performance Comparison</h3>
-                <canvas id="chart-models"></canvas>
+
+            <div
+                class="lg:col-span-2 rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm flex flex-col opacity-0 group">
+                <h3
+                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-6 flex items-center gap-3">
+                    <div class="p-1.5 rounded-lg bg-[#e8f5e9] text-[#2d6a4f]"><svg xmlns="http://www.w3.org/2000/svg"
+                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg></div>
+                    Machine Learning Model Correlation
+                </h3>
+                <div class="relative w-full h-[450px]">
+                    <canvas id="chart-models"></canvas>
+                </div>
             </div>
+
         </div>
-    </section>
 
-    <footer class="footer">
-        <p>Smart Food Waste Prediction System &copy; 2026</p>
-    </footer>
+    </main>
+</div>
+{% endblock %}
 
-    <script src="{{ url_for('static', filename='charts.js') }}"></script>
-</body>
+{% block scripts %}
+<script src="{{ url_for('static', filename='charts.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const { animate, inView, stagger } = Motion;
 
-</html>
+        inView("#chart-grid", () => {
+            animate(
+                "#chart-grid > div",
+                { y: [40, 0], opacity: [0, 1] },
+                { duration: 0.8, delay: stagger(0.15), easing: "ease-out" }
+            );
+        });
+    });
+</script>
+<style>
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

@@ -1,191 +1,379 @@
 /**
- * PrepNova — Organic Professional Charts
+ * Smart Food Waste Prediction System — Charts
+ * Fetches analytics data and renders Farm UI Chart.js charts.
  */
 
+// Farm-inspired lush green palette
 const COLORS = {
-    primary: '#4B6F44',      /* Sage Green */
-    primaryDark: '#3A5A34',
-    secondary: '#2C3E2D',    /* Forest Green */
-    accent: '#BC6C4D',       /* Terracotta */
-    warm: '#E5E1DA',         /* Sand */
-    sunny: '#D4AF37',        /* Gold */
-    cloudy: '#A0A9A1',
-    rainy: '#6B8E23',        /* Olive */
-    stormy: '#4F4F4F',
-    bg: '#FDFCF9',
-    grid: '#E5E1DA',
-    text: '#2C3E2D',
-    text_secondary: '#5C6B5D',
-    text_muted: '#A0A9A1'
+    primary: '#1b4332',     // Dark forest green
+    foreground: '#2d6a4f',  // Emerald
+    accent1: '#52b788',     // Light emerald
+    accent2: '#d8f3dc',     // Soft mint 
+    muted: '#a8a29e',       // stone-400
+    grid: 'rgba(0,0,0,0.04)',
+    paper: '#f5f5f4',       // stone-100
+
+    // Semantic
+    cloudy: '#94a3b8',
+    rainy: '#60a5fa',
+    stormy: '#818cf8',
+    sunny: '#fbbf24',
+
+    festival: '#fcd34d',
+    regular: '#1b4332'
 };
 
+const fontConfig = {
+    family: "'Inter', sans-serif",
+    size: 11,
+    weight: '500',
+    color: COLORS.muted
+};
+
+// Shadcn aesthetic: No X grid, dashed Y grid, hidden axes lines
 const chartDefaults = {
     responsive: true,
-    maintainAspectRatio: true,
-    interaction: {
-        mode: 'index',
-        intersect: false,
-    },
+    maintainAspectRatio: false,
     plugins: {
         legend: {
-            display: true,
-            position: 'top',
-            align: 'end',
-            labels: {
-                color: COLORS.text,
-                usePointStyle: true,
-                pointStyle: 'circle',
-                padding: 20,
-                font: { family: "'Inter', sans-serif", size: 12, weight: '600' }
-            }
+            display: false
         },
         tooltip: {
-            backgroundColor: '#FFFFFF',
-            titleColor: COLORS.text,
-            bodyColor: COLORS.text_secondary,
-            borderColor: COLORS.grid,
-            borderWidth: 1,
+            backgroundColor: 'rgba(28, 25, 23, 0.95)', // stone-900
+            titleColor: '#fafaf9',
+            titleFont: { family: "'Inter', sans-serif", weight: 'bold', size: 12 },
+            bodyColor: '#e7e5e4',
+            bodyFont: { family: "'Inter', sans-serif", size: 12 },
             padding: 12,
             cornerRadius: 8,
             boxPadding: 6,
-            usePointStyle: true,
-            font: { family: "'Inter', sans-serif" }
+            displayColors: false,
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1
         }
     },
     scales: {
         x: {
-            grid: { display: false },
-            ticks: { color: COLORS.text_muted, font: { family: "'Inter', sans-serif", size: 11 } }
+            grid: { display: false, drawBorder: false },
+            border: { display: false },
+            ticks: { font: fontConfig, color: COLORS.muted, padding: 8 }
         },
         y: {
-            grid: { color: COLORS.grid, drawBorder: false, borderDash: [4, 4] },
-            ticks: { color: COLORS.text_muted, font: { family: "'Inter', sans-serif", size: 11 }, padding: 10 }
-        },
+            grid: {
+                color: COLORS.grid,
+                drawBorder: false,
+                tickLength: 0,
+                tickColor: 'transparent',
+                // Make grid lines dashed for a cleaner data-viz look
+                borderDash: [5, 5]
+            },
+            border: { display: false },
+            ticks: {
+                font: fontConfig,
+                color: COLORS.muted,
+                padding: 12,
+                maxTicksLimit: 6
+            },
+            beginAtZero: true
+        }
+    },
+    interaction: {
+        mode: 'index',
+        intersect: false,
     },
 };
 
-async function loadCharts() {
-    try {
-        const res = await fetch('/api/analytics-summary');
-        if (!res.ok) throw new Error('Failed to fetch analytics data');
-        const data = await res.json();
+// Gradient generator
+const createGradient = (ctx, colorStart, colorEnd) => {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+    return gradient;
+};
 
-        // 1. Weekday Chart
-        const ctxWeekday = document.getElementById('chart-weekday').getContext('2d');
-        const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        new Chart(ctxWeekday, {
-            type: 'bar',
-            data: {
-                labels: dayOrder,
-                datasets: [{
-                    label: 'Avg Meals',
-                    data: dayOrder.map(d => data.day_means[d]?.toFixed(1) || 0),
-                    backgroundColor: COLORS.primary,
-                    borderRadius: 4,
-                }],
-            },
-            options: {
-                ...chartDefaults,
-                plugins: { ...chartDefaults.plugins, legend: { display: false } },
-            },
-        });
-
-        // 2. Weather Chart
-        const weatherOrder = ['Sunny', 'Cloudy', 'Rainy', 'Stormy'];
-        const weatherColors = [COLORS.sunny, COLORS.cloudy, COLORS.rainy, COLORS.stormy];
-        new Chart(document.getElementById('chart-weather'), {
-            type: 'bar',
-            data: {
-                labels: weatherOrder,
-                datasets: [{
-                    label: 'Avg Meals',
-                    data: weatherOrder.map(w => data.weather_means[w]?.toFixed(1) || 0),
-                    backgroundColor: weatherColors,
-                    borderRadius: 4,
-                }],
-            },
-            options: {
-                ...chartDefaults,
-                plugins: { ...chartDefaults.plugins, legend: { display: false } },
-            },
-        });
-
-        // 3. Festival Chart
-        new Chart(document.getElementById('chart-festival'), {
-            type: 'bar',
-            data: {
-                labels: ['Standard', 'Event'],
-                datasets: [{
-                    label: 'Avg Meals',
-                    data: [
-                        data.festival_means['0']?.toFixed(1) || 0,
-                        data.festival_means['1']?.toFixed(1) || 0,
-                    ],
-                    backgroundColor: [COLORS.warm, COLORS.primary],
-                    borderRadius: 4,
-                }],
-            },
-            options: {
-                ...chartDefaults,
-                plugins: { ...chartDefaults.plugins, legend: { display: false } },
-            },
-        });
-
-        // 4. Scatter Chart
-        const scatterData = data.scatter.customers.map((c, i) => ({
-            x: c,
-            y: data.scatter.meals[i],
-        }));
-        new Chart(document.getElementById('chart-scatter'), {
-            type: 'scatter',
-            data: {
-                datasets: [{
-                    label: 'Customers vs Meals',
-                    data: scatterData,
-                    backgroundColor: COLORS.primary,
-                    pointRadius: 4,
-                }],
-            },
-            options: {
-                ...chartDefaults,
-                scales: {
-                    x: { ...chartDefaults.scales.x, title: { display: true, text: 'Expected Foot Traffic' } },
-                    y: { ...chartDefaults.scales.y, title: { display: true, text: 'Meals Consumed' } },
-                },
-            },
-        });
-
-        // 5. Model Comparison
-        const modelNames = Object.keys(data.model_results);
-        new Chart(document.getElementById('chart-models'), {
-            type: 'line',
-            data: {
-                labels: modelNames,
-                datasets: [
-                    {
-                        label: 'Mean Error (MAE)',
-                        data: modelNames.map(n => data.model_results[n].MAE.toFixed(1)),
-                        borderColor: COLORS.primary,
-                        backgroundColor: 'transparent',
-                        tension: 0.4,
-                        pointRadius: 4,
-                    },
-                    {
-                        label: 'RMSE',
-                        data: modelNames.map(n => data.model_results[n].RMSE.toFixed(1)),
-                        borderColor: COLORS.accent,
-                        backgroundColor: 'transparent',
-                        borderDash: [5, 5],
-                        tension: 0.4,
-                        pointRadius: 4,
-                    },
-                ],
-            },
-            options: chartDefaults,
-        });
-    } catch (e) {
-        console.error("Error loading charts:", e);
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Fetch Analytics Summary if on Analytics Page
+    if (document.getElementById('chart-weekday')) {
+        fetch('/api/analytics-summary')
+            .then(res => res.json())
+            .then(data => {
+                if (data.day_means) renderWeekdayChart(data.day_means);
+                if (data.weather_means) renderWeatherChart(data.weather_means);
+                if (data.festival_means) renderFestivalChart(data.festival_means);
+                if (data.scatter) renderScatterChart(data.scatter);
+                if (data.model_results) renderModelComparisonChart(data.model_results);
+            })
+            .catch(err => console.error("Error fetching analytics summary:", err));
     }
+
+    // 2. Fetch Dashboard Data if on History Page
+    if (document.getElementById('chart-history')) {
+        fetch('/api/dashboard-data')
+            .then(res => res.json())
+            .then(data => {
+                renderHistoricalChart(data);
+            })
+            .catch(err => console.error("Error fetching dashboard data:", err));
+    }
+});
+
+function renderWeekdayChart(data) {
+    const ctx = document.getElementById('chart-weekday').getContext('2d');
+    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dayOrder,
+            datasets: [{
+                label: 'Avg Yield',
+                data: dayOrder.map(d => data[d] || 0),
+                backgroundColor: COLORS.primary,
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                maxBarThickness: 40
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: {
+                ...chartDefaults.plugins,
+                tooltip: {
+                    ...chartDefaults.plugins.tooltip,
+                    callbacks: {
+                        label: (ctx) => `Avg Yield: ${Math.round(ctx.raw)} Meals`
+                    }
+                }
+            }
+        }
+    });
 }
 
-loadCharts();
+function renderWeatherChart(data) {
+    const ctx = document.getElementById('chart-weather').getContext('2d');
+    const weatherOrder = ['Sunny', 'Cloudy', 'Rainy', 'Stormy'];
+    const weatherColors = [COLORS.sunny, COLORS.cloudy, COLORS.rainy, COLORS.stormy];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weatherOrder,
+            datasets: [{
+                label: 'Avg Meals',
+                data: weatherOrder.map(w => data[w] || 0),
+                backgroundColor: weatherColors,
+                borderRadius: 6,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                maxBarThickness: 40
+            }]
+        },
+        options: chartDefaults
+    });
+}
+
+function renderFestivalChart(data) {
+    const ctx = document.getElementById('chart-festival').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Routine Day', 'Festival Day'],
+            datasets: [{
+                data: [data['0'] || 0, data['1'] || 0],
+                backgroundColor: [COLORS.muted, COLORS.primary],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%', // sleek thin doughnut
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 24,
+                        font: fontConfig,
+                        color: COLORS.muted
+                    }
+                },
+                tooltip: chartDefaults.plugins.tooltip
+            }
+        }
+    });
+}
+
+function hexToRgba(hex, alpha) {
+    let r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function renderScatterChart(data) {
+    const ctx = document.getElementById('chart-scatter').getContext('2d');
+
+    // Add visual jitter to X-axis to break apart strict rigid columns from synthetic data
+    const scatterPoints = data.customers.map((c, i) => {
+        const jitter = (Math.random() - 0.5) * (c * 0.08); // +/- 4% jitter
+        return {
+            x: Math.round(c + jitter),
+            y: data.meals[i],
+            originalX: c // keep original for tooltip
+        };
+    });
+
+    // Color by weather map
+    const weatherColorsMap = {
+        'Cloudy': COLORS.cloudy,
+        'Rainy': COLORS.rainy,
+        'Stormy': COLORS.stormy,
+        'Sunny': COLORS.sunny,
+    };
+
+    // Convert to hex with opacity to show overlap density clearly
+    const pointColors = data.weather.map(w => hexToRgba(weatherColorsMap[w] || COLORS.primary, 0.6));
+
+    new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Operational Points',
+                data: scatterPoints,
+                backgroundColor: pointColors,
+                pointBorderColor: 'white',
+                pointBorderWidth: 1.5,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                ...chartDefaults.scales,
+                x: {
+                    ...chartDefaults.scales.x,
+                    title: {
+                        display: true,
+                        text: 'Expected Footfall (People)',
+                        font: fontConfig,
+                        color: COLORS.muted,
+                        padding: { top: 10 }
+                    }
+                },
+                y: {
+                    ...chartDefaults.scales.y,
+                    title: {
+                        display: true,
+                        text: 'Actual Consumption (Meals)',
+                        font: fontConfig,
+                        color: COLORS.muted,
+                        padding: { bottom: 10 }
+                    }
+                }
+            },
+            plugins: {
+                ...chartDefaults.plugins,
+                tooltip: {
+                    ...chartDefaults.plugins.tooltip,
+                    callbacks: {
+                        label: (ctx) => `Expected: ${ctx.raw.originalX} » Actual: ${ctx.raw.y}`
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderModelComparisonChart(data) {
+    const ctx = document.getElementById('chart-models').getContext('2d');
+
+    const labels = Object.keys(data);
+    const maeData = labels.map(model => data[model].MAE);
+    const rmseData = labels.map(model => data[model].RMSE);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'MAE',
+                    data: maeData,
+                    backgroundColor: COLORS.primary,
+                    borderRadius: 4,
+                    barPercentage: 0.4
+                },
+                {
+                    label: 'RMSE',
+                    data: rmseData,
+                    backgroundColor: COLORS.muted,
+                    borderRadius: 4,
+                    barPercentage: 0.4
+                }
+            ]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: {
+                ...chartDefaults.plugins,
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        boxHeight: 8
+                    }
+                },
+                tooltip: {
+                    ...chartDefaults.plugins.tooltip,
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        }
+    });
+}
+
+function renderHistoricalChart(data) {
+    const ctx = document.getElementById('chart-history').getContext('2d');
+    const gradientFill = createGradient(ctx, 'rgba(45, 106, 79, 0.4)', 'rgba(45, 106, 79, 0.0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.timestamps,
+            datasets: [{
+                label: 'Target Yield',
+                data: data.recommendations,
+                borderColor: COLORS.foreground,
+                borderWidth: 2.5,
+                backgroundColor: gradientFill,
+                fill: true,
+                pointBackgroundColor: COLORS.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.4 // Smooth splines
+            }]
+        },
+        options: {
+            ...chartDefaults,
+            plugins: {
+                ...chartDefaults.plugins,
+                tooltip: {
+                    ...chartDefaults.plugins.tooltip,
+                    callbacks: {
+                        label: (ctx) => `Target Yield: ${Math.round(ctx.raw)} Meals`
+                    }
+                }
+            }
+        }
+    });
+}
