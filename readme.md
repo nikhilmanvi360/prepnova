@@ -88,14 +88,6 @@ The system is continuously verified against a verified ledger of actual consumpt
 
 ---
 
-## 📸 Intelligence Interface
-
-### 🏗️ Decision Support Home
-![Home Hero](docs/images/home_hero.png)
-
-### 📊 Performance Analytics
-![Analytics View](docs/images/analytics_dashboard.png)
-
 ---
 
 ## ⚙️ Deployment & Installation
