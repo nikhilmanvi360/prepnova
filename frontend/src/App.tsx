@@ -111,7 +111,7 @@ const Navbar = () => (
       ))}
     </div>
 
-    <PremiumButton href="http://localhost:5000" icon={ExternalLink} variant="accent" className="!py-2.5 !px-6 !text-sm">
+    <PremiumButton href={import.meta.env.VITE_API_URL || "http://localhost:5000"} icon={ExternalLink} variant="accent" className="!py-2.5 !px-6 !text-sm">
       Launch App
     </PremiumButton>
   </motion.nav>
@@ -161,7 +161,7 @@ const Hero = () => {
           </FadeIn>
 
           <FadeIn delay={0.3} className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
+            <PremiumButton href={import.meta.env.VITE_API_URL || "http://localhost:5000"} icon={ArrowRight} variant="primary">
               Launch Prediction Engine
             </PremiumButton>
           </FadeIn>
@@ -369,7 +369,7 @@ const ProcessSection = () => {
               <p className="text-xl text-ink-light leading-relaxed mb-12">
                 Running a kitchen on intuition inherently creates waste. Our machine learning pipeline shifts operations from reactive guessing to proactive precision.
               </p>
-              <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
+              <PremiumButton href={import.meta.env.VITE_API_URL || "http://localhost:5000"} icon={ArrowRight} variant="primary">
                 Launch the Intelligence Tool
               </PremiumButton>
             </FadeIn>
@@ -442,7 +442,7 @@ const StorySection = () => (
           </div>
 
           <div className="mt-14">
-            <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary">
+            <PremiumButton href={import.meta.env.VITE_API_URL || "http://localhost:5000"} icon={ArrowRight} variant="primary">
               Launch the Intelligence Tool
             </PremiumButton>
           </div>
@@ -494,7 +494,7 @@ const MovementSection = () => (
         <p className="text-2xl md:text-3xl text-ink-light leading-relaxed font-light mb-16">
           Through awareness and technology, our goal is simple: <strong className="text-moss font-medium">1 Million Meals Saved by 2027.</strong>
         </p>
-        <PremiumButton href="http://localhost:5000" icon={ArrowRight} variant="primary" className="mx-auto !text-xl px-12 py-5">
+        <PremiumButton href={import.meta.env.VITE_API_URL || "http://localhost:5000"} icon={ArrowRight} variant="primary" className="mx-auto !text-xl px-12 py-5">
           Start Optimizing Now
         </PremiumButton>
       </FadeIn>
@@ -526,10 +526,10 @@ const Footer = () => (
       <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12 border-t md:border-t-0 border-paper/10 pt-12 md:pt-0">
         <div className="flex flex-col gap-6">
           <h4 className="text-xs uppercase tracking-[0.2em] text-paper/30 font-bold mb-4">Platform</h4>
-          <a href="http://localhost:5000" className="text-paper/80 hover:text-earth-accent transition-colors flex items-center gap-2 group text-lg">
+          <a href={import.meta.env.VITE_API_URL || "http://localhost:5000"} className="text-paper/80 hover:text-earth-accent transition-colors flex items-center gap-2 group text-lg">
             Launch Application <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
           </a>
-          <a href="http://localhost:5000/analytics" className="text-paper/80 hover:text-earth-accent transition-colors flex items-center gap-2 group text-lg">
+          <a href={`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/analytics`} className="text-paper/80 hover:text-earth-accent transition-colors flex items-center gap-2 group text-lg">
             View Analytics <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
           </a>
         </div>

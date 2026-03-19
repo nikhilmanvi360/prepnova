@@ -17,10 +17,12 @@ from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask_cors import CORS
 
 # == App Setup =========================================================
 app = Flask(__name__)
-app.secret_key = 'food-waste-pred-2026'
+CORS(app) # Enable CORS for all routes
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'food-waste-pred-2026')
 DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
 
 def get_db_connection():

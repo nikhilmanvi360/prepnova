@@ -10,3 +10,5 @@ seaborn
 joblib
 requests
 holidays
+gunicorn
+flask-cors
