@@ -476,3 +476,40 @@ if __name__ == '__main__':
     print(" ➜  http://localhost:5000")
     print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+from flask import Flask, request, jsonify
+from agent import PrepNovaAgent
+
+app = Flask(__name__)
+agent = PrepNovaAgent()
+
+@app.route("/agent/decision", methods=["POST"])
+def decision():
+    data = request.json
+    predicted = data["predicted_demand"]
+    inventory = data["current_inventory"]
+
+    recommendation = agent.generate_recommendation(predicted, inventory)
+    plan = agent.generate_production_plan(predicted)
+    risk = agent.risk_alert(predicted, inventory)
+
+    return jsonify({
+        "recommendation": recommendation,
+        "production_plan": plan,
+        "risk": risk
+    })
+
+
+@app.route("/agent/query", methods=["POST"])
+def query():
+    data = request.json
+    query = data["query"]
+    predicted = data["predicted_demand"]
+
+    response = agent.natural_query(query, predicted)
+
+    return jsonify({
+        "response": response
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
